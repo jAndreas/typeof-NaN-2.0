@@ -52,7 +52,7 @@
 			
 			Public.listen = function _listen( eventType, callback, scope ) {
 				if( Object.type( eventType ) !== 'Array' ) {
-					eventName = [ eventType ];
+					eventType = [ eventType ];
 				}
 				
 				eventType.forEach(function _forEach( event ) {
