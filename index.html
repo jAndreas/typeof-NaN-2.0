@@ -78,6 +78,7 @@
     </header>
     
     <div id="main" role="main">
+    	<h1>Hello Foo !</h1>
     </div>
     
     <footer>
@@ -89,22 +90,13 @@
     <script>DD_belatedPNG.fix('img, .png_bg'); // Fix any <img> or .png_bg bg-images. Also, please read goo.gl/mZiyb </script>
   <![endif]-->
   
-  <!-- MXHR Supply gets us all those scripts in one request -->
-  <script src="/js/supply.min.js?v=2"></script>
-  <script type="text/javascript">	
-	supply.setDealer('/cgi-bin/supply.pl').files({
-			debug: false,
-			javascript: [
-				'/js/jquery-1.5.1.min.js',
-				'/js/jquery-ui-1.8.4.custom.min.js',
-				'/js/toolkit.min.js',
-				'/js/init.min.js',
-				'/js/core.min.js',
-				'/js/sandbox.min.js'
-			]			
-	});				
-  </script>
-
+  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+  <script>window.jQuery || document.write("<script src='js/libs/jquery-1.5.1.min.js'>\x3C/script>")</script>
+  
+  <!-- scripts concatenated and minified via ant build script-->
+  <script src="js/script.js"></script>
+  <!-- end scripts-->
 
   <script type="text/javascript">
     var _gaq=[['_setAccount','UA-11599146-2'],['_trackPageview']];
