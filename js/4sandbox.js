@@ -59,10 +59,10 @@
 					if( typeof event === 'string' ) {
 						if( typeof Private.messagePool[ event ] === 'undefined' ) {
 							Private.messagePool[ event ] = [ ];
+						}
 							
-							if( typeof callback === 'function' ) {
-								Private.messagePool[ event ].push( { callback: callback, scope: scope } );
-							}
+						if( typeof callback === 'function' ) {
+							Private.messagePool[ event ].push( { callback: callback, scope: scope } );
 						}
 					} else {
 						Core.error({
