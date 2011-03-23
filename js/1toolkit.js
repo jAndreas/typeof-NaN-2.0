@@ -47,7 +47,7 @@
 			throw new TypeError( 'Array.prototype.indexOf' ); 
 		}
 			
-		var t	= new Object( this ),
+		var t	= this instanceof Object ? this : new Object( this ),
 			len = t.length >>> 0,
 			n	= 0,
 			k	= 0;
@@ -78,7 +78,7 @@
 			throw new TypeError( 'Array.prototype.lastIndexOf' ); 
 		}
 			
-		var t	= new Object( this ),
+		var t	= this instanceof Object ? this : new Object( this ),
 			len = t.length >>> 0,
 			n	= len,
 			k	= 0;
@@ -107,7 +107,7 @@
 			throw new TypeError('Array.prototype.filter'); 
 		}
 			
-		var t		= new Object(this),
+		var t		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
 			res		= [],
 			i		= 0,
@@ -136,7 +136,7 @@
 			throw new TypeError( 'Array.prototype.map' ); 
 		}
 			
-		var t		= new Object( this ),
+		var t		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
 			res		= new Array( len ),
 			i		= 0,
@@ -159,7 +159,7 @@
     	if( this === undef || this === null )
 			throw new TypeError( 'Array.prototype.forEach' );
 			
-		var t 		= new Object( this ),
+		var t 		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
 			thisv	= arguments[ 1 ];
 			
@@ -178,7 +178,7 @@
 		if( this === undef || this === null )
 			throw new TypeError( 'Array.prototype.every' );
 			
-		var t 		= new Object( this ),
+		var t 		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
 			thisv	= arguments[ 1 ];
 			
@@ -198,7 +198,7 @@
 		if( this === undef || this === null )
 			throw new TypeError( 'Array.prototype.some' );
 			
-		var t 		= new Object( this ),
+		var t 		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
 			thisv	= arguments[ 1 ];
 			
@@ -264,4 +264,3 @@
 		});
 	}
 }(window, window.document));
- 

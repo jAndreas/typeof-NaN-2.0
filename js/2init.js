@@ -31,34 +31,34 @@
 				
 		// set a Template Toolkit variable
 		Public.setTTvar			= function _setTTvar() {
-            if( arguments.length ) {
-                var arg = arguments[ 0 ];
-                if( Public.type( arg ) === 'Object' ) {
-                    Object.keys( arg ).forEach(function _forEach( key ) {
+			if( arguments.length ) {
+				var arg = arguments[ 0 ];
+				if( Public.type( arg ) === 'Object' ) {
+					Object.keys( arg ).forEach(function _forEach( key ) {
 						Private.TTData[ key ] = isJSON.test( arg[ key ] ) ? JSON.parse( arg[ key ] ) : arg[ key ]; 
-                    });
-                }
-                else if( typeof arg === 'string' && typeof arguments[ 1 ] === 'string' ) {
+					});
+				}
+				else if( typeof arg === 'string' && typeof arguments[ 1 ] === 'string' ) {
 					var value = arguments[ 1 ];
 					Private.TTData[ arg ] = isJSON.test( value ) ? JSON.parse( value ) : value;
-                }
-                else { 
-                	throw new TypeError( 'addTTvar: wrong arguments' );
-                }
-            }
-        };
+				}
+				else { 
+					throw new TypeError( 'addTTvar: wrong arguments' );
+				}
+			}
+		};
 
 		// get a Template Toolkit variable, create a shortcut method aswell
-        Public.getTTvar			= Public.TT = function _getTTvar( key ) {
+		Public.getTTvar			= Public.TT = function _getTTvar( key ) {
 			return Private.TTData[ key ];
-        };
+		};
         
         // also, expose the data container directly
-        Public.TT				= Private.TTData;
+		Public.TT				= Private.TTData;
         
 		
 		return Public;
 	}());
 	
 	win.ir.apps.PagePreview = PagePreview;
-}(window, window.document));
+}( window, window.document ));

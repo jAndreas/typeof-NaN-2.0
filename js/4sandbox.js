@@ -15,9 +15,10 @@
 !(function _sandbox_wrap( win, doc, undef ) {
 	"use strict";
 	win.ir = win.ir || { };
+	win.ir.components = win.ir.components || { };
 	
-	if( 'Core' in win.ir ) {
-		var Core = win.ir.Core;
+	if( 'Core' in win.ir.components ) {
+		var Core = win.ir.components.Core;
 		
 		var Sandbox = (function _Sandbox() {
 			var Public		= { },
@@ -31,7 +32,7 @@
 					if( typeof messageInfo.type === 'string' ) {
 						if( messageInfo.type in Private.messagePool ) {
 							Private.messagePool[ messageInfo.type ].forEach(function( listener ) {
-								listener.callback.apply( listener.scope, [ messageInfo.data ] );
+								listener.callback.apply( listener.scope, [ messageInfo ] );
 							});	
 						}
 					}
@@ -73,13 +74,15 @@
 				});
 			};
 			
+			Public.error = Core.error;
+			
 							
 			return Public;
 		}());
 	
-		win.ir.Sandbox = Sandbox;
+		win.ir.components.Sandbox = Sandbox;
 	}
 	else {
 		throw new ReferenceError( 'Sandbox: Core object not found' );
 	}
-}(window, window.document));
+}( window, window.document ));

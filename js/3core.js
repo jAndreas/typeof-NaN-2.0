@@ -15,6 +15,7 @@
 !(function _core_wrap( win, doc, $, undef ) {
 	"use strict";
 	win.ir = win.ir || { };
+	win.ir.components = win.ir.components || { };
 	
 	var Core = (function _Core() {
 		var moduleData	= { },
@@ -89,7 +90,7 @@
 			}
 		};
 		
-		Public.setSandbox = function _setSandbox( sandbox ) {
+		Public.linkSandbox = function _linkSandbox( sandbox ) {
 			if( typeof sandbox === 'function' ) {
 				Sandbox = sandbox;
 			}
@@ -110,11 +111,15 @@
 		Public.DOM.find = function _find( selector ) {
 			return $( selector );
 		};
+		
+		Public.DOM.ready = function _ready( method ) {
+			$( method );
+		};
 		/*----- -------------------------------------------------- ------*/
 		/*----- -------------- BLOCK END ------------------------- ------*/ }
 		
 		return Public;
 	}());
 	
-	win.ir.Core = Core;
-}(window, window.document, jQuery));
+	win.ir.components.Core = Core;
+}( window, window.document, jQuery ));
