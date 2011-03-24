@@ -14,8 +14,8 @@
  
 !(function _core_wrap( win, doc, $, undef ) {
 	"use strict";
-	win.ir = win.ir || { };
-	win.ir.components = win.ir.components || { };
+	var IR = win.ir = win.ir || { };
+	var IRcomponents = IR.components = IR.components || { };
 	
 	var Core = (function _Core() {
 		var moduleData	= { },
@@ -97,7 +97,7 @@
 			else {
 				Public.error({
 					type:	'type',
-					msg:	'Core: setSandbox() requires a function reference'
+					msg:	'Core: linkSandbox() requires a function reference'
 				});
 			}
 		};
@@ -121,5 +121,5 @@
 		return Public;
 	}());
 	
-	win.ir.components.Core = Core;
+	IRcomponents.Core = Core;
 }( window, window.document, jQuery ));
