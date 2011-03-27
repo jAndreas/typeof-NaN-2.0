@@ -445,11 +445,17 @@
     <!-- JAVASCRIPT -->
     <target name="-js.main.concat" depends="-load-build-info" description="(PRIVATE) Concatenates the JS files in dir.js">
         <echo message="Concatenating Main JS scripts..."/>
-        <concat destfile="./${dir.publish}/${dir.js}/scripts-${build.number}.js">
+        <concat destfile="./${dir.publish}/${dir.js}/typeofnan-${build.number}.js">
+        	<filelist dir="./${dir.publish}/${dir.js}/" files="toolkit.min.js, init.min.js, core.min.js, sandbox.min.js, module.min.js"/>
             <fileset dir="./${dir.publish}/">
                 <include name="**/${dir.js.main}/*.min.js"/>
                 <exclude name="**/${dir.js.mylibs}/*.js"/>
                 <exclude name="**/${dir.js.libs}/*.js"/>
+                <exclude name="**/toolkit.min.js"/>
+                <exclude name="**/init.min.js"/>
+                <exclude name="**/core.min.js"/>
+                <exclude name="**/sandbox.min.js"/>
+                <exclude name="**/module.min.js"/>
             </fileset>      
         </concat>
     </target>
@@ -467,18 +473,18 @@
     
     <target name="-js.scripts.concat" depends="-load-build-info" if="build.concat.scripts">
         <echo message="Concatenating library file with main script file"/>
-        <concat destfile="./${dir.publish}/${dir.js}/scripts-${build.number}.min.js">
+        <concat destfile="./${dir.publish}/${dir.js}/typeofnan-${build.number}.min.js">
             <fileset dir="./${dir.publish}/${dir.js}/">
                 <include name="libs-${build.number}.js"/>
-                <include name="scripts-${build.number}.js"/>
+                <include name="typeofnan-${build.number}.js"/>
             </fileset>      
         </concat>
         
         <echo message="Concatenating library file with main debug script file"/>
-        <concat destfile="./${dir.publish}/${dir.js}/scripts-${build.number}-debug.min.js">
+        <concat destfile="./${dir.publish}/${dir.js}/typeofnan-${build.number}-debug.min.js">
             <fileset dir="./${dir.publish}/${dir.js}/">
                 <include name="libs-${build.number}.js"/>
-                <include name="scripts-${build.number}-debug.js"/>
+                <include name="typeofnan-${build.number}-debug.js"/>
             </fileset>      
         </concat>
     </target>
@@ -595,8 +601,8 @@
     
     <target name="-html" depends="-load-build-info" description="(PRIVATE) Very basic clean up of the HTML">
         <echo message="Update the HTML to reference our concatenated script file: scripts-${build.number}.min.js"/>
-        <!-- style.css replacement handled as a replacetoken above -->
-        <replaceregexp match="&lt;!-- scripts concatenated [\d\w\s\W]*?!-- end ((scripts)|(concatenated and minified scripts))--&gt;" replace="&lt;script src='${dir.js}/scripts-${build.number}.min.js\'&gt;&lt;/script&gt;" flags="m">
+        <!-- scripts.js replacement handled as a replacetoken above -->
+        <replaceregexp match="&lt;!-- scripts concatenated [\d\w\s\W]*?!-- end ((scripts)|(concatenated and minified scripts))--&gt;" replace="&lt;script src='${dir.js}/typeofnan-${build.number}.min.js\'&gt;&lt;/script&gt;" flags="m">
             <fileset dir="./${dir.publish}" includes="${page-files}"/>
         </replaceregexp>
         <!--[! use comments like this one to avoid having them get minified -->
