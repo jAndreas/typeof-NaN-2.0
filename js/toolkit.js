@@ -10,7 +10,7 @@
  * Author: Andreas Goebel
  * Date: 2011-03-15
  */
- 
+
 !(function _toolkit_wrap( win, doc, undef ) {
 	"use strict";
 	
@@ -39,6 +39,22 @@
 		}
 		
 		return res;
+	};
+	
+	// Object.prototype.hasKeys() - Non-standard. Returns true if all keys are available in an object
+	Object.prototype.hasKeys = function( keys ) {
+		if( typeof keys === 'string' ) {
+			keys = keys.split( /\s/ );
+		}
+		
+		if( Object.type( keys ) === 'Array' ) {
+			var that = this;
+			return keys.every(function( prop ) {
+				return prop in that;
+			});
+		}
+		
+		return false;
 	};
 	
 	// Array.prototype.indexOf()

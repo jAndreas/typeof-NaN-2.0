@@ -11,13 +11,13 @@
  * Author: Andreas Goebel
  * Date: 2011-03-17
  */
- 
+
 !(function _sandbox_wrap( win, doc, undef ) {
 	"use strict";
-	var IR = win.ir = win.ir || { };
-	var IRcomponents = IR.components = IR.components || { };
+	var IR = win.ir = win.ir || { },
+		IRcomponents = IR.components = IR.components || { },
 	
-	var Sandbox = function _Sandbox( Core ) {
+	Sandbox = function _Sandbox( Core ) {
 		var Public		= { },
 			Private		= {
 				messagePool:	{ }
@@ -73,7 +73,6 @@
 			
 			Public.error = Core.error;
 			
-							
 			return Public;
 		}
 		else {

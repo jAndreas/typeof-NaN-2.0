@@ -8,13 +8,13 @@
  * Author: Andreas Goebel
  * Date: 2011-03-17
  */
- 
+
 !(function _init_wrap( win, doc, undef ) {
 	"use strict";
-	var IR = win.ir = win.ir || { };
-	var IRapps = IR.apps = IR.apps || { };
+	var IR = win.ir = win.ir || { },
+		IRapps = IR.apps = IR.apps || { },
 
-	var PagePreview = (function _PagePreview() {
+	PagePreview = (function _PagePreview() {
 		var	Public				= { },
 			Private				= {
 				// object to store Template Toolkit passed data
@@ -48,11 +48,11 @@
 		};
 
 		// get a Template Toolkit variable, create a shortcut method aswell
-		Public.getTTvar			= Public.TT = function _getTTvar( key ) {
+		Public.getTTvar			= Public.T = function _getTTvar( key ) {
 			return Private.TemplateToolkit[ key ];
 		};
         
-        // also, expose the data container directly
+        // also, expose the data container directly (TODO: reconsider this.)
 		Public.TT				= Private.TemplateToolkit;
         
 		return Public;
