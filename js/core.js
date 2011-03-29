@@ -103,21 +103,54 @@
 		};
 		/*----- -------------------------------------------------- ------*/
 		/*----- -------------- BLOCK END ------------------------- ------*/ }
-		 
-		 
+
+
 		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.5.1 ******** *******/
 		/****** ************************************************** *******/ {
 		Public.DOM = { };
 		Public.DOM.find = function _find( selector ) {
-			return $( selector );
+			return $( selector ).get();
 		};
-		
+
 		Public.DOM.ready = function _ready( method ) {
 			$( method );
+			return Public;
+		};
+
+		Public.DOM.bind = function _bind( node, ev, handler ) {
+			$( node ).bind( ev, handler );
+			return Public;
+		};
+
+		Public.DOM.unbind = function _unbind( node, ev, handler ) {
+			$( node ).unbind( ev, handler );
+			return Public;
+		};
+
+		Public.DOM.delegate = function _delegate( root, selector, ev, handler ) {
+			$( root ).delegate( selector, ev, handler );
+			return Public;
+		}
+
+		Public.DOM.snapshot = function _snapshot( root ) {
+			if( Object.type( root ) === 'Node' ) {
+				var snap 	= [ ],
+					$root 	= $( root );
+					
+				$root.children().each(function _snapshot_each( node ) {
+					
+				});
+			}
+			else {
+				Public.error({
+					type:	'type',
+					msg:	'Core: snapshot() expects a DOM node'
+				});
+			}
 		};
 		/*----- -------------------------------------------------- ------*/
 		/*----- -------------- BLOCK END ------------------------- ------*/ }
-		
+
 		return Public;
 	}());
 	

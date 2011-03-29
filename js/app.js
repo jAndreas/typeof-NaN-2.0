@@ -10,9 +10,10 @@
 !(function( win ) {
 	"use strict";
 	var IR = win.ir = win.ir || { },
-		IRcomponents = win.ir.components = win.ir.components || { };
+		IRcomponents = IR.components = IR.components || { },
+		IRapps = IR.apps = IR.apps || { };
 
-	if( IRcomponents.hasKeys( 'Core Sandbox Module' ) ) {
+	if( IRcomponents.hasKeys( 'Core Sandbox Module' ) && IRapps.hasKeys( 'PagePreview' ) ) {
 		var Core	= IRcomponents.Core,
 			Sandbox	= IRcomponents.Sandbox,
 			Module	= IRcomponents.Module;
@@ -24,7 +25,7 @@
 		Core.startAll();
 	}
 	else {
-		throw new ReferenceError( 'Sandbox: Core object not found' ); 
+		throw new ReferenceError( 'PagePreview: unable to resolve necessary application object' ); 
 	}
 	
 }( window ));
