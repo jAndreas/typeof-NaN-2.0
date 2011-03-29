@@ -21,7 +21,8 @@
 		var moduleData	= { },
 			Public		= { },
 			Private		= { },
-			Sandbox		= function Sandbox() { };
+			Sandbox		= function Sandbox() { },
+			push		= Array.prototype.push;
 		
 		/****** MODULE SPECIFIC METHODS (LIFECYCLE, COMMUNICATION) *******/
 		/****** ************************************************** *******/ {
@@ -107,32 +108,52 @@
 
 		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.5.1 ******** *******/
 		/****** ************************************************** *******/ {
-		Public.DOM = { };
-		Public.DOM.find = function _find( selector ) {
-			return $( selector ).get();
+		Public.D = function( selector ) {
+			function init( sel ) {
+				push.apply( this, $( selector ).get() );
+			}
+
+			init.prototype = Private.DOM;
+			init.constructor = Core;
+
+			return new init( selector );
 		};
 
-		Public.DOM.ready = function _ready( method ) {
-			$( method );
-			return Public;
+		Private.DOM.ready = function _ready( method ) {
+			$.fn.ready.call( this, method );
+			return this;
 		};
 
-		Public.DOM.bind = function _bind( node, ev, handler ) {
-			$( node ).bind( ev, handler );
-			return Public;
+		Private.DOM.bind = function _bind( ev, handler ) {
+			$.fn.bind.call( this, ev, handler );
+			return this;
 		};
 
-		Public.DOM.unbind = function _unbind( node, ev, handler ) {
-			$( node ).unbind( ev, handler );
-			return Public;
+		Private.DOM.unbind = function _unbind( node, ev, handler ) {
+			$.fn.unbind.call( this, ev, handler );
+			return this;
 		};
 
-		Public.DOM.delegate = function _delegate( root, selector, ev, handler ) {
-			$( root ).delegate( selector, ev, handler );
-			return Public;
+		Private.DOM.delegate = function _delegate( selector, ev, handler ) {
+			$.fn.live.call( this, ev, handler, undef, selector );
+			return this;
 		}
+		
+		Private.DOM.undelegate = function _die( selector, ev, handler ) {
+			if( arguments.length === 0 ) {
+				$.fn.unbind.call( this, 'live' );
+			}
+			else {
+				$.fn.die.call( this, ev, null, handler, selector );
+			}
+			return this;
+		};
+		
+		Private.DOM.remove = function _remove() {
+			$.fn.remove.call( this );
+		};
 
-		Public.DOM.snapshot = function _snapshot( root ) {
+		Private.DOM.snapshot = function _snapshot( root ) {
 			if( Object.type( root ) === 'Node' ) {
 				var snap 	= [ ],
 					$root 	= $( root );
