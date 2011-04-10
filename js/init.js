@@ -18,9 +18,9 @@
 		var	Public				= { },
 			Private				= {
 				// object to store Template Toolkit passed data
-				TemplateToolkit: { }
-			},
-			isJSON				= /^(?:\{.*\}|\[.*\])$/;	// JSON validation regex
+				TemplateToolkit: { },
+				isJSON:	/^(?:\{.*\}|\[.*\])$/;	// JSON validation regex
+			};
 
 		// copy / shortcut some native methods
 		Public.toStr			= Object.prototype.toString;
@@ -34,12 +34,12 @@
 				var arg = arguments[ 0 ];
 				if( Public.type( arg ) === 'Object' ) {
 					Object.keys( arg ).forEach(function _forEach( key ) {
-						Private.TemplateToolkit[ key ] = isJSON.test( arg[ key ] ) ? JSON.parse( arg[ key ] ) : arg[ key ]; 
+						Private.TemplateToolkit[ key ] = Private.isJSON.test( arg[ key ] ) ? JSON.parse( arg[ key ] ) : arg[ key ]; 
 					});
 				}
 				else if( typeof arg === 'string' && typeof arguments[ 1 ] === 'string' ) {
 					var value = arguments[ 1 ];
-					Private.TemplateToolkit[ arg ] = isJSON.test( value ) ? JSON.parse( value ) : value;
+					Private.TemplateToolkit[ arg ] = Private.isJSON.test( value ) ? JSON.parse( value ) : value;
 				}
 				else { 
 					throw new TypeError( 'addTTvar: wrong arguments' );
