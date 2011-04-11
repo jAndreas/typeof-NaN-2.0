@@ -92,14 +92,14 @@
 			}
 		};
 		
-		Public.registerSandbox = function _linkSandbox( sandbox ) {
+		Public.registerSandbox = function _registerSandbox( sandbox ) {
 			if( typeof sandbox === 'function' ) {
 				Sandbox = sandbox;
 			}
 			else {
 				Public.error({
 					type:	'type',
-					msg:	'Core: linkSandbox() requires a function reference'
+					msg:	'Core: registerSandbox() requires a function reference'
 				});
 			}
 		};
