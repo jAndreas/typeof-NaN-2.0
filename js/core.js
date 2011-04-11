@@ -22,7 +22,8 @@
 			Public		= { },
 			Private		= { },
 			Sandbox		= function Sandbox() { },
-			push		= Array.prototype.push;
+			push		= Array.prototype.push,
+			slice		= Array.prototype.slice;
 		
 		/****** MODULE SPECIFIC METHODS (LIFECYCLE, COMMUNICATION) *******/
 		/****** ************************************************** *******/ {
@@ -63,7 +64,7 @@
 			});
 		};
 		
-		Public.error = function( err ) {
+		Public.error = function _error( err ) {
 			if( Object.type( err ) === 'Object' ) {
 				if( typeof err.type === 'string' ) {
 					switch( err.type.toLowerCase() ) {
@@ -108,17 +109,19 @@
 
 		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.5.1 ******** *******/
 		/****** ************************************************** *******/ {
-		Public.D = function( selector ) {
+		Public.$ = function _$( selector ) {
 			function init( sel ) {
+				this.constructor = _$;
 				push.apply( this, $( selector ).get() );
 			}
 
 			init.prototype = Private.DOM;
-			init.constructor = Core;
-
+			init.constructor = _$;
+			
 			return new init( selector );
 		};
-
+		
+		Private.DOM = { };
 		Private.DOM.ready = function _ready( method ) {
 			$.fn.ready.call( this, method );
 			return this;
@@ -132,6 +135,15 @@
 		Private.DOM.unbind = function _unbind( node, ev, handler ) {
 			$.fn.unbind.call( this, ev, handler );
 			return this;
+		};
+		
+		Private.DOM.slice = function( ) {
+			var newRef	= this.constructor(),
+				args	= arguments;
+				
+			push.apply( newRef, ( slice.apply( this, args ) ) );
+			
+			return newRef;
 		};
 
 		Private.DOM.delegate = function _delegate( selector, ev, handler ) {
