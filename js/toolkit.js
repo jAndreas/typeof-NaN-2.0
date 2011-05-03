@@ -229,6 +229,29 @@
 		return false;
 	};
 	
+	win.requestAnimFrame = (function() {
+		return	win.requestAnimationFrame       || 
+				win.webkitRequestAnimationFrame || 
+				win.mozRequestAnimationFrame    || 
+				win.oRequestAnimationFrame      || 
+				win.msRequestAnimationFrame     || 
+				function _animationInterval( callback ) {
+					setTimeout( function() {
+						if( 'hasFocus' in doc ) {
+							if( doc.hasFocus() ) {
+								callback();
+							}
+							else {
+								_animationInterval( callback );
+							}
+						}
+						else {
+							callback();
+						}
+					}, 1000 / 60 );
+				};
+    }());
+	
 	// _ie_garbage_collect helps IE<=8 to garbage collect named function expressions. The function assumes that the expression name is
 	// identical to the methodname, with a leading underscore.
 	win._ie_garbage_collect = function( targets ) {
