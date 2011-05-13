@@ -5,24 +5,28 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-23
+ * Changed: 2011-05-06
  */
  
-!(function( win ) {
+!(function _application_wrap( win ) {
 	"use strict";
 	var IR = win.ir = win.ir || { },
 		IRcomponents = IR.components = IR.components || { },
 		IRapps = IR.apps = IR.apps || { };
 
-	if( IRcomponents.hasKeys( 'Core Sandbox Module' ) && IRapps.hasKeys( 'PagePreview' ) ) {
-		var Core	= IRcomponents.Core,
-			Sandbox	= IRcomponents.Sandbox,
-			Module	= IRcomponents.Module;
-
+	if( Object.hasKeys( IRcomponents, 'Core Sandbox' ) && Object.hasKeys( IRapps, 'PagePreview' ) ) {
+		var Core		= IRcomponents.Core,
+			Sandbox		= IRcomponents.Sandbox,
+			Modules		= IRcomponents.Modules,
+			PagePreview = IRapps.PagePreview;
+	
 		Core.registerSandbox( Sandbox );
 		
-		Core.register( 'foobar', Module );
+		Core.registerModule( 'Filter', Modules.Filter );
 		
 		Core.startAll();
+		
+		setTimeout(Core.stopAll, 3000);
 	}
 	else {
 		throw new ReferenceError( 'PagePreview: unable to resolve necessary application object' ); 

@@ -9,6 +9,7 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-15
+ * Modified: 2011-05-09
  */
 
 !(function _toolkit_wrap( win, doc, undef ) {
@@ -24,14 +25,14 @@
 	// Object.keys()
 	Object.keys = Object.keys || function _keys( o ) {
 		var ret=[], p, has = Object.prototype.hasOwnProperty;
-	    for( p in o ) {
+		for( p in o ) {
 			if( has.call( o,p ) ) { ret.push( p ); }
 		}
 
-	    return ret;
+		return ret;
 	};
 	
-	// Object.type() - Non-standard. Returns the [[Class]] property from an object. Returns 'Node' for all HTMLxxxElement objects
+	// Object.type() - Non-standard. Returns the [[Class]] property from an object. Returns 'Node' for all HTMLxxxElement collections
 	Object.type = function _type( obj ) {
 		var res = ToStr.call( obj ).split( ' ' )[ 1 ].replace( ']', '' );
 		if( res.indexOf( 'HTML' ) === 0 ) { 
@@ -41,20 +42,56 @@
 		return res;
 	};
 	
-	// Object.prototype.hasKeys() - Non-standard. Returns true if all keys are available in an object
-	Object.prototype.hasKeys = function( keys ) {
+	// Object.hasKeys() - Non-standard. Returns true if all keys are available in an object
+	Object.hasKeys = function _hasKeys( obj, keys ) {
 		if( typeof keys === 'string' ) {
 			keys = keys.split( /\s/ );
 		}
 		
-		if( Object.type( keys ) === 'Array' ) {
-			var that = this;
-			return keys.every(function( prop ) {
-				return prop in that;
-			});
+		if( Object.type( obj ) === 'Object' ) {
+			if( Object.type( keys ) === 'Array' ) {
+				return keys.every(function _every( prop ) {
+					return prop in obj;
+				});
+			}
 		}
 		
 		return false;
+	};
+	
+	// Object.lookup() - Non-standard. Trys to lookup a chain of objects. When finished we return two possible methods, "execute" & "get".
+	Object.lookup = function _lookup( lookup, failGracefully ) {
+		var check	= null,
+			chain	= [ ],
+			lastkey	= '';
+		
+		if( typeof lookup === 'string' ) {
+			lookup.split( /\./ ).forEach(function _forEach( key, index, arr ) {
+				if( check ) {
+					if( key in check ) {
+						chain.push( check = check[ key ] );
+						lastkey = key;
+					}
+					else {
+						if( !failGracefully ) {
+							throw new TypeError( 'cannot resolve "' + key + '" in ' + lastkey );	
+						}
+					}
+				}
+				else {
+					chain.push( check = win[ key ] );
+				}
+			});
+		}
+		
+		return {
+			execute: function _execute() {
+				return typeof check === 'function' ? check.apply( chain[chain.length - 2], arguments ) : null;
+			},
+			get: function _get() {
+				return check;
+			}
+		};
 	};
 	
 	// Array.prototype.indexOf()
@@ -172,7 +209,7 @@
 	
 	// Array.prototype.forEach()
 	Array.prototype.forEach = Array.prototype.forEach || function _forEach(fnc /*, thisv */) {
-    	if( this === undef || this === null )
+		if( this === undef || this === null )
 			throw new TypeError( 'Array.prototype.forEach' );
 			
 		var t 		= this instanceof Object ? this : new Object( this ),
@@ -181,8 +218,8 @@
 			
 		if( typeof fnc !== 'function' )
 			throw new TypeError( 'Array.prototype.forEach' );
-	    
-	    for(i = 0; i < len; i++) {
+
+		for(i = 0; i < len; i++) {
 			if( i in t )
 				fnc.call( thisv, t[ i ], i, t );
 		}
@@ -229,6 +266,7 @@
 		return false;
 	};
 	
+	// window.requestAnimationFrame()
 	win.requestAnimFrame = (function() {
 		return	win.requestAnimationFrame       || 
 				win.webkitRequestAnimationFrame || 
@@ -250,7 +288,7 @@
 						}
 					}, 1000 / 60 );
 				};
-    }());
+	}());
 	
 	// _ie_garbage_collect helps IE<=8 to garbage collect named function expressions. The function assumes that the expression name is
 	// identical to the methodname, with a leading underscore.

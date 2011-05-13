@@ -10,6 +10,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
+ * Changed: 2011-05-12
  */
 
 !(function _core_wrap( win, doc, $, undef ) {
@@ -21,74 +22,20 @@
 		var moduleData	= { },
 			Public		= { },
 			Private		= { },
-			Sandbox		= function Sandbox() { },
-			push		= Array.prototype.push,
-			slice		= Array.prototype.slice;
+			Application	= { },
+			Sandbox		= function Sandbox() { };
 		
-		/****** MODULE SPECIFIC METHODS (LIFECYCLE, COMMUNICATION) *******/
-		/****** ************************************************** *******/ {
-		Public.register	= function _register( moduleID, creator ) {
-			moduleData[ moduleID ] = {
-				creator: creator,
-				instance: null
-			};
-		};
-		
-		Public.start = function _start( moduleID ) {
-			if( moduleID in moduleData ) {
-				var data = moduleData[ moduleID ];
-				data.instance = data.creator( new Sandbox( this ) );
-				data.instance.init();
+		/****** CORE SPECIFIC METHODS (MODULE LIFECYCLE, SANDBOX)  *******/
+		/****** ************************************************** *******/
+		Public.registerApplication = function _registerApplication( app ) {
+			if( Object.type( app ) === 'Object' ) {
+				Application = app;
 			}
-		};
-		
-		Public.stop = function _stop( moduleID ) {
-			if( moduleID in moduleData ) {
-				var data = moduleData[ moduleID ];
-				if( data.instance ) {
-					data.instance.destroy();
-					data.instance = null;
-				}
-			}
-		};
-		
-		Public.startAll = function _startAll() {
-			Object.keys( moduleData ).forEach(function _forEach( moduleID ) {
-				Public.start( moduleID );
-			});
-		};
-		
-		Public.stopAll = function _stopAll() {
-			Object.keys( moduleData ).forEach(function _forEach( moduleID ) {
-				Public.stop( moduleID );
-			});
-		};
-		
-		Public.error = function _error( err ) {
-			if( Object.type( err ) === 'Object' ) {
-				if( typeof err.type === 'string' ) {
-					switch( err.type.toLowerCase() ) {
-						case 'type': {
-							throw new TypeError( err.msg );
-							break;
-						}
-						case 'reference': {
-							throw new ReferenceError( err.msg );
-							break;
-						}
-						case 'syntax': {
-							throw new SyntaxError( err.msg );
-							break;
-						}
-						default: {
-							throw new Error( err.msg );
-							break;
-						}
-					}
-				}
-				else {
-					throw new TypeError( 'Core: error() called with wrong arguments' );
-				}
+			else {
+				Public.error({
+					type:	'type',
+					msg:	'Core: registerApplication() requires an object'
+				});
 			}
 		};
 		
@@ -102,87 +49,110 @@
 					msg:	'Core: registerSandbox() requires a function reference'
 				});
 			}
-		};
-		/*----- -------------------------------------------------- ------*/
-		/*----- -------------- BLOCK END ------------------------- ------*/ }
-
-
-		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.5.1 ******** *******/
-		/****** ************************************************** *******/ {
-		Public.$ = function _$( selector ) {
-			function init( sel ) {
-				this.constructor = _$;
-				push.apply( this, $( selector ).get() );
-			}
-
-			init.prototype = Private.DOM;
-			init.constructor = _$;
 			
-			return new init( selector );
-		};
-		
-		Private.DOM = { };
-		Private.DOM.ready = function _ready( method ) {
-			$.fn.ready.call( this, method );
-			return this;
-		};
-
-		Private.DOM.bind = function _bind( ev, handler ) {
-			$.fn.bind.call( this, ev, handler );
-			return this;
-		};
-
-		Private.DOM.unbind = function _unbind( node, ev, handler ) {
-			$.fn.unbind.call( this, ev, handler );
 			return this;
 		};
 		
-		Private.DOM.slice = function( ) {
-			var newRef	= this.constructor(),
-				args	= arguments;
+		Public.registerModule = function _registerModule( moduleID, creator ) {
+			if( typeof moduleID === 'string' && typeof creator === 'function' ) {
+				moduleData[ moduleID ] = {
+					creator: creator,
+					instance: null
+				};
 				
-			push.apply( newRef, ( slice.apply( this, args ) ) );
+				return this;
+			}
+			else {
+				throw new Error( 'Core: registerModule() -> string/function pair expected, received ' + typeof moduleID + '/' + typeof creator + ' instead' );
+			}
+		};
+		
+		Public.start = function _start( moduleID ) {
+			if( moduleID in moduleData ) {
+				var data = moduleData[ moduleID ];
+				try {
+					data.instance = data.creator( new Sandbox( this ), Application );
+					data.instance.init();
+				} catch( ex ) {
+					throw new Error( 'Core: unable to load module "' + moduleID + '". Error was: ' + ex.message );
+				}
+			}
 			
-			return newRef;
-		};
-
-		Private.DOM.delegate = function _delegate( selector, ev, handler ) {
-			$.fn.live.call( this, ev, handler, undef, selector );
-			return this;
-		}
-		
-		Private.DOM.undelegate = function _die( selector, ev, handler ) {
-			if( arguments.length === 0 ) {
-				$.fn.unbind.call( this, 'live' );
-			}
-			else {
-				$.fn.die.call( this, ev, null, handler, selector );
-			}
 			return this;
 		};
 		
-		Private.DOM.remove = function _remove() {
-			$.fn.remove.call( this );
-		};
-
-		Private.DOM.snapshot = function _snapshot( root ) {
-			if( Object.type( root ) === 'Node' ) {
-				var snap 	= [ ],
-					$root 	= $( root );
-					
-				$root.children().each(function _snapshot_each( node ) {
-					
-				});
+		Public.stop = function _stop( moduleID ) {
+			if( moduleID in moduleData ) {
+				var data = moduleData[ moduleID ];
+				try {
+					if( data.instance ) {
+						data.instance.destroy();
+						data.instance = null;
+					}
+				} catch( ex ) {
+					throw new Error( 'Core: unable to unload module "' + moduleID + '". Error was: ' + ex.message );
+				}
 			}
-			else {
-				Public.error({
-					type:	'type',
-					msg:	'Core: snapshot() expects a DOM node'
-				});
-			}
+			
+			return this;
 		};
-		/*----- -------------------------------------------------- ------*/
-		/*----- -------------- BLOCK END ------------------------- ------*/ }
+		
+		Public.startAll = function _startAll() {
+			Object.keys( moduleData ).forEach(function _forEach( moduleID ) {
+				Public.start( moduleID );
+			});
+			
+			return this;
+		};
+		
+		Public.stopAll = function _stopAll() {
+			Object.keys( moduleData ).forEach(function _forEach( moduleID ) {
+				Public.stop( moduleID );
+			});
+			
+			return this;
+		};
+		
+		Public.error = function _error( err ) {
+			if( Object.type( err ) === 'Object' ) {
+				if( typeof err.type === 'string' ) {
+					switch( err.type.toLowerCase() ) {
+						case 'type':
+							throw new TypeError( err.msg );
+						case 'reference':
+							throw new ReferenceError( err.msg );
+						case 'syntax':
+							throw new SyntaxError( err.msg );
+						default:
+							throw new Error( err.msg );
+					}
+				}
+				else {
+					throw new TypeError( 'Core: error() called with wrong arguments' );
+				}
+			}
+			
+			return this;
+		};
+		/*^^^^^ ^^^^^^^^^^^^^^^^^^^BLOCK END^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
+		
+		Public.Promise = function _Promise() {
+			return $.Deferred.apply( null, arguments );
+		};
+		
+		Public.when	= function _when() {
+			return $.when.apply( null, arguments );
+		};
+		
+		Public.extend = function _extend() {
+			return $.extend.apply( null, arguments );
+		};
+		
+		Public.plugin = function _plugin( ext ) {
+			ext.apply( Public, [win, doc, $, Private, Public, Sandbox, Application] );
+			
+			return this;
+		};
 
 		return Public;
 	}());

@@ -5,11 +5,13 @@
  * It's responsible for the communication with other Modules, Ajax requests, retrieving a Module's base
  * DOM node, event handlers etc.
  * 
- * Every task a Module wants to accomplish must be marshaled through the Sandbox.
+ * Every task a Module wants to accomplish must be marshaled through the Sandbox. Infact, the Sandbox object
+ * does not implement any functionality at all. It's just the modules view and interface to the Core.
  *
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
+ * Changed: 2011-05-09
  */
 
 !(function _sandbox_wrap( win, doc, undef ) {
@@ -19,59 +21,22 @@
 	
 	Sandbox = function _Sandbox( Core ) {
 		var Public		= { },
-			Private		= {
-				messagePool:	{ }
-			};
+			Private		= { };
+			
+		function assign( method ) {
+			if( method in Core && typeof Core[ method ] === 'function' ) {
+				Public[ method ] = Core[ method ];
+			}
+			else {
+				// should we fail silently here instead ?
+				throw new ReferenceError( 'Sandbox: Method "' + method + '" not available in Core' );
+			}
+		}
 
 		if( Object.type( Core ) === 'Object' ) {
-			Public.dispatch = function _dispatch( messageInfo ) {
-				if( Object.type( messageInfo ) === 'Object' ) {
-					if( typeof messageInfo.type === 'string' ) {
-						if( messageInfo.type in Private.messagePool ) {
-							Private.messagePool[ messageInfo.type ].forEach(function( listener ) {
-								listener.callback.apply( listener.scope, [ messageInfo ] );
-							});	
-						}
-					}
-					else {
-						Core.error({
-							type:	'syntax',
-							msg:	'Sandbox: dispatch() expects an event type as string'
-						});
-					}
-				}
-				else {
-					Core.error({
-						type:	'syntax',
-						msg:	'Sandbox: dispatch() expects an object'
-					});
-				}
-			};
-			
-			Public.listen = function _listen( eventType, callback, scope ) {
-				if( Object.type( eventType ) !== 'Array' ) {
-					eventType = [ eventType ];
-				}
-				
-				eventType.forEach(function _forEach( event ) {
-					if( typeof event === 'string' ) {
-						if( typeof Private.messagePool[ event ] === 'undefined' ) {
-							Private.messagePool[ event ] = [ ];
-						}
-							
-						if( typeof callback === 'function' ) {
-							Private.messagePool[ event ].push( { callback: callback, scope: scope } );
-						}
-					} else {
-						Core.error({
-							type:	'syntax',
-							msg:	'Sandbox: listen() expects a string value (or an Array of strings)'
-						});
-					}
-				});
-			};
-			
-			Public.error = Core.error;
+			'error listen dispatch forget request Promise when $ extend'.split( /\s/ ).forEach(function( methodName ) {
+				assign( methodName );
+			});
 			
 			return Public;
 		}
