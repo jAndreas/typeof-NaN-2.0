@@ -28,8 +28,10 @@
 									listener.callback.apply( listener.scope, [ messageInfo ] );
 								} catch( ex ) {
 									Public.error({
-										type: 'error',
-										msg: 'Core: unable to dispatch event "' + messageInfo.name + '". Original error: "' + ex.message + '"'
+										type:	'error',
+										origin:	'Core COM',
+										name:	'_dispatch -> _forEach',
+										msg:	'unable to dispatch event "' + messageInfo.name + '". Original error: "' + ex.message + '"'
 									});
 								}
 							});	
@@ -38,14 +40,18 @@
 					else {
 						Core.error({
 							type:	'syntax',
-							msg:	'Core: dispatch() expects an event type as string'
+							origin:	'Core COM',
+							name:	'_dispatch',
+							msg:	'expected an event type as string'
 						});
 					}
 				}
 				else {
 					Core.error({
 						type:	'syntax',
-						msg:	'Core: dispatch() expects an object'
+						origin:	'Core COM',
+						name:	'_dispatch',
+						msg:	'expected an object'
 					});
 				}
 				
@@ -69,7 +75,9 @@
 					} else {
 						Core.error({
 							type:	'syntax',
-							msg:	'Core: listen() expects a string value (or an Array of strings)'
+							origin:	'Core COM',
+							name:	'_listen',
+							msg:	'expected a string value (or an Array of strings), received ' + Object.type( event ) + ' instead'
 						});
 					}
 				});
@@ -97,7 +105,9 @@
 						else {
 							Core.error({
 								type:	'syntax',
-								msg:	'Core: forget() expects a string value (or an Array of strings)'
+								origin:	'Core COM',
+								name:	'_forget',
+								msg:	'expected a string value (or an Array of strings)'
 							});
 						}
 					});

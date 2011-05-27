@@ -7,7 +7,7 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-05-13
+ * Changed: 2011-05-16
  */
 
 !(function _init_wrap( win, doc, undef ) {
@@ -48,7 +48,12 @@
 					Private.TemplateToolkit[ arg ] = Private.isJSON.test( value ) ? JSON.parse( value ) : value;
 				}
 				else { 
-					throw new TypeError( 'addTTvar: wrong arguments' );
+					Core.error({
+						type:	'type',
+						origin:	'App init',
+						name:	'_setTTvar()',
+						msg:	'object or string/string arguments expected, received' + Object.type( arg ) + '/' + Object.type( arguments[ 1 ] ) + ' instead'
+					});
 				}
 			}
 		};
@@ -69,38 +74,40 @@
 				cache			= { };
 	
 			return function _createCSSClosure( name ) {
+				name = name.replace( /^./, name.charAt( 0 ).toUpperCase() ).replace( /-/, '' );
+				
 				if( name in cache ) { return cache[ name ]; }
-	
+
 				for( var prop in divStyle ) {
 					if( prop.toLowerCase() === name.toLowerCase() ) {
 						cache[ name ] = prop;
 						return prop;
 					}
 				}
-	
-				'Moz Webkit ms O'.split(' ').some(function _some( prefix ) {
+
+				'Moz Webkit ms O'.split( ' ' ).some(function _some( prefix ) {
 					ret = prefix + name;
-	
+
 					if( name in divStyle ) {
 						ret = cache[ name ] = name;
 						return true;
 					}
-	
+
 					if( ret in divStyle ) {
 						cache[ name ] = ret;
 						return true;
 					}
-	
+
 					for( var prop in divStyle ) {
 						if( prop.toLowerCase() === ret.toLowerCase() ) {
 							ret = cache[ name ] = prop;
 							return true;
 						}
 					}
-	
+
 					ret = null;
 				});
-	
+
 				return ret;
 			};
 		}());

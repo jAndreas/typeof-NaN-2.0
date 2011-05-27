@@ -35,7 +35,14 @@
 	// Object.type() - Non-standard. Returns the [[Class]] property from an object. Returns 'Node' for all HTMLxxxElement collections
 	Object.type = function _type( obj ) {
 		var res = ToStr.call( obj ).split( ' ' )[ 1 ].replace( ']', '' );
-		if( res.indexOf( 'HTML' ) === 0 ) { 
+		
+		if( obj === win ) {
+			return 'Window';
+		}
+		else if( res === 'Window' || res === 'Global' ) {
+			return 'Undefined';
+		}
+		else if( res.indexOf( 'HTML' ) === 0 ) { 
 			return 'Node';
 		}
 		
@@ -57,6 +64,22 @@
 		}
 		
 		return false;
+	};
+	
+	// Object.map - Non-standard. Takes an object and a transform method (which gets passed in key/values). The Method must return an Array with new key/value pair
+	Object.map = function _map( obj, transform ) {
+		if( Object.type( obj ) === 'Object' && Object.type( transform ) === 'Function' ) {
+			Object.keys( obj ).forEach(function _forEach( key ) {
+				(function _mapping( oldkey, transmuted ) {
+					if( transmuted && transmuted.length ) {
+						obj[ transmuted[0] || oldkey ] = transmuted[ 1 ];
+						if( transmuted[0] && oldkey !== transmuted[0] ) { 
+							delete obj[ oldkey ];
+						}
+					}
+				}( key, transform.apply( obj, [ key, obj[ key ]] ) ));
+			});
+		}
 	};
 	
 	// Object.lookup() - Non-standard. Trys to lookup a chain of objects. When finished we return two possible methods, "execute" & "get".

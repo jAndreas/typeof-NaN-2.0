@@ -24,14 +24,18 @@
 		Public.init = function _init() {
 			Sandbox.error({
 				type:	'custom',
-				msg:	'Module: missing init() implementation'
+				origin:	'Module Constructor',
+				name:	'_init()',
+				msg:	'missing init() implementation'
 			});
 		};
 		
 		Public.destroy = function _destroy() {
 			Sandbox.error({
 				type:	'custom',
-				msg:	'Module: missing destroy() implementation'
+				origin:	'Module Constructor',
+				name:	'_destroy()',
+				msg:	'missing destroy() implementation'
 			});
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/

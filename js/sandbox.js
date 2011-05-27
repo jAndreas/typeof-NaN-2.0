@@ -29,12 +29,26 @@
 			}
 			else {
 				// should we fail silently here instead ?
-				throw new ReferenceError( 'Sandbox: Method "' + method + '" not available in Core' );
+				Core.error({
+					type:	'reference',
+					origin:	'Sandbox',
+					name:	'assign',
+					msg:	'Method "' + method + '" not available in Core'
+				});
 			}
 		}
+		
+		Private.access = [	'error', 
+							'listen', 'dispatch', 'forget',
+							'request',
+							'Promise', 'when',
+							'$', 'ready',
+							'data', 'removeData', 'hasData',
+							'extend'
+		];
 
 		if( Object.type( Core ) === 'Object' ) {
-			'error listen dispatch forget request Promise when $ extend'.split( /\s/ ).forEach(function( methodName ) {
+			Private.access.forEach(function( methodName ) {
 				assign( methodName );
 			});
 			

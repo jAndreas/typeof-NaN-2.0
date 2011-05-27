@@ -16,7 +16,7 @@
 		var Core = IRcomponents.Core;
 		
 		Core.plugin(function _plugin( win, doc, $, Private, Public, Sandbox, PagePreview, undef ) {
-			/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.0 ******** *******/
+			/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.1 ******** *******/
 			/****** ************************************************** *******/
 			var TT	= PagePreview.TT;
 			
@@ -30,7 +30,7 @@
 					beforeSend:	params.beforeSend	|| $.noop,
 					data:		$.extend({
 						sid:	TT.sid,
-						rm:		params.rm		|| ''
+						rm:		params.rm	|| ''
 					}, params.data || { } ),
 					success:	params.success		|| $.noop,
 					error:		params.error		|| $.noop,

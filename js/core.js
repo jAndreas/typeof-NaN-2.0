@@ -10,7 +10,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-05-12
+ * Changed: 2011-05-16
  */
 
 !(function _core_wrap( win, doc, $, undef ) {
@@ -34,7 +34,9 @@
 			else {
 				Public.error({
 					type:	'type',
-					msg:	'Core: registerApplication() requires an object'
+					origin:	'Core',
+					name:	'_registerApplication',
+					msg:	'object was expected, received ' + Object.type( app ) + ' instead'
 				});
 			}
 		};
@@ -46,7 +48,9 @@
 			else {
 				Public.error({
 					type:	'type',
-					msg:	'Core: registerSandbox() requires a function reference'
+					origin:	'Core',
+					name:	'_registerSandbox',
+					msg:	'function was expected, received ' + Object.type( sandbox ) + ' instead'
 				});
 			}
 			
@@ -55,15 +59,30 @@
 		
 		Public.registerModule = function _registerModule( moduleID, creator ) {
 			if( typeof moduleID === 'string' && typeof creator === 'function' ) {
-				moduleData[ moduleID ] = {
-					creator: creator,
-					instance: null
-				};
+				if( !(moduleID in moduleData) ) {
+					moduleData[ moduleID ] = {
+						creator: creator,
+						instance: null
+					};
+				}
+				else {
+					Public.error({
+						type:	'custom',
+						origin:	'Core',
+						name:	'_registerModule',
+						msg:	'Module name "' + moduleID + '" already registered'
+					});
+				}
 				
 				return this;
 			}
 			else {
-				throw new Error( 'Core: registerModule() -> string/function pair expected, received ' + typeof moduleID + '/' + typeof creator + ' instead' );
+				Public.error({
+					type:	'type',
+					origin:	'Core',
+					name:	'_registerModule',
+					msg:	'string/function pair expected, received ' + Object.type( moduleID ) + '/' + Object.type( creator ) + ' instead'
+				});
 			}
 		};
 		
@@ -74,7 +93,12 @@
 					data.instance = data.creator( new Sandbox( this ), Application );
 					data.instance.init();
 				} catch( ex ) {
-					throw new Error( 'Core: unable to load module "' + moduleID + '". Error was: ' + ex.message );
+					Public.error({
+						type:	'unknown',
+						origin:	'Core',
+						name:	'_start',
+						msg:	'unable to load module "' + moduleID + '". Error was: ' + ex.message + '\n\n' + 'Stacktrace: ' + ( ex.stack || ex.stacktrace )
+					});
 				}
 			}
 			
@@ -90,7 +114,12 @@
 						data.instance = null;
 					}
 				} catch( ex ) {
-					throw new Error( 'Core: unable to unload module "' + moduleID + '". Error was: ' + ex.message );
+					Public.error({
+						type:	'unknown',
+						origin:	'Core',
+						name:	'_stop',
+						msg:	'unable to unload module "' + moduleID + '". Error was: ' + ex.message + '\n\n' + 'Stacktrace: ' + (ex.stack || ex.stacktrace)
+					});
 				}
 			}
 			
@@ -116,15 +145,17 @@
 		Public.error = function _error( err ) {
 			if( Object.type( err ) === 'Object' ) {
 				if( typeof err.type === 'string' ) {
+					var output = '\n\n' + 'Origin: ' + (err.origin || 'General') + '\n' + 'Calling context: ' + (err.name || 'Unknown') + '\n' + 'Message: ' +  (err.msg || '');
+
 					switch( err.type.toLowerCase() ) {
 						case 'type':
-							throw new TypeError( err.msg );
+							throw new TypeError( output );
 						case 'reference':
-							throw new ReferenceError( err.msg );
+							throw new ReferenceError( output );
 						case 'syntax':
-							throw new SyntaxError( err.msg );
+							throw new SyntaxError( output );
 						default:
-							throw new Error( err.msg );
+							throw new Error( 'Error: ' + err.type + output );
 					}
 				}
 				else {

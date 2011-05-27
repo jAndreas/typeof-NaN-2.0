@@ -17,8 +17,7 @@
 	if( Object.hasKeys( IRcomponents, 'Core Sandbox' ) && Object.hasKeys( IRapps, 'PagePreview' ) ) {
 		var Core		= IRcomponents.Core,
 			Sandbox		= IRcomponents.Sandbox,
-			Modules		= IRcomponents.Modules,
-			PagePreview = IRapps.PagePreview;
+			Modules		= IRcomponents.Modules;
 	
 		Core.registerSandbox( Sandbox );
 		
@@ -26,7 +25,7 @@
 		
 		Core.startAll();
 		
-		setTimeout(Core.stopAll, 3000);
+		setTimeout(Core.stopAll, 6000);
 	}
 	else {
 		throw new ReferenceError( 'PagePreview: unable to resolve necessary application object' ); 
