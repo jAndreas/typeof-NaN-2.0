@@ -39,6 +39,8 @@
 					msg:	'object was expected, received ' + Object.type( app ) + ' instead'
 				});
 			}
+			
+			return Public;
 		};
 		
 		Public.registerSandbox = function _registerSandbox( sandbox ) {
@@ -54,7 +56,7 @@
 				});
 			}
 			
-			return this;
+			return Public;
 		};
 		
 		Public.registerModule = function _registerModule( moduleID, creator ) {
@@ -84,12 +86,18 @@
 					msg:	'string/function pair expected, received ' + Object.type( moduleID ) + '/' + Object.type( creator ) + ' instead'
 				});
 			}
+			
+			return Public;
 		};
 		
 		Public.start = function _start( moduleID ) {
 			if( moduleID in moduleData ) {
 				var data = moduleData[ moduleID ];
 				try {
+					if( data.instance && !data.instance.multipleInstances ) {
+						throw new Error( 'Module "' + moduleID + '" does not allow multiple instances' );
+					}
+					
 					data.instance = data.creator( new Sandbox( this ), Application );
 					data.instance.init();
 				} catch( ex ) {
@@ -97,12 +105,12 @@
 						type:	'unknown',
 						origin:	'Core',
 						name:	'_start',
-						msg:	'unable to load module "' + moduleID + '". Error was: ' + ex.message + '\n\n' + 'Stacktrace: ' + ( ex.stack || ex.stacktrace )
+						msg:	'unable to load module "' + moduleID + '". Error was: ' + ex.message + '\n\n' + 'Stacktrace:\n' + Private.formatStacktrace( ex.stack || ex.stacktrace )
 					});
 				}
 			}
 			
-			return this;
+			return Public;
 		};
 		
 		Public.stop = function _stop( moduleID ) {
@@ -123,7 +131,7 @@
 				}
 			}
 			
-			return this;
+			return Public;
 		};
 		
 		Public.startAll = function _startAll() {
@@ -131,7 +139,7 @@
 				Public.start( moduleID );
 			});
 			
-			return this;
+			return Public;
 		};
 		
 		Public.stopAll = function _stopAll() {
@@ -139,7 +147,7 @@
 				Public.stop( moduleID );
 			});
 			
-			return this;
+			return Public;
 		};
 		
 		Public.error = function _error( err ) {
@@ -155,7 +163,7 @@
 						case 'syntax':
 							throw new SyntaxError( output );
 						default:
-							throw new Error( 'Error: ' + err.type + output );
+							throw new Error( err.type + output );
 					}
 				}
 				else {
@@ -163,26 +171,62 @@
 				}
 			}
 			
-			return this;
+			return Public;
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^BLOCK END^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		
 		Public.Promise = function _Promise() {
+			Private.verify( this );
+			
 			return $.Deferred.apply( null, arguments );
 		};
 		
 		Public.when	= function _when() {
+			Private.verify( this );
+			
 			return $.when.apply( null, arguments );
 		};
 		
 		Public.extend = function _extend() {
+			Private.verify( this );
+			
 			return $.extend.apply( null, arguments );
 		};
 		
 		Public.plugin = function _plugin( ext ) {
 			ext.apply( Public, [win, doc, $, Private, Public, Sandbox, Application] );
 			
-			return this;
+			return Public;
+		};
+		/*^^^^^ ^^^^^^^^^^^^^^^^^^^BLOCK END^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
+		
+		Private.verify = function( ctx ) {
+			if( ctx.sb !== Sandbox ) {
+				Public.error({
+					type:	'reference',
+					origin:	'Core',
+					name:	'verify() -> ' + ( ctx.name || '(no caller available)' ),
+					msg:	'Unauthorized call of Core method. Call this method through the Sandbox only'
+				});
+			}
+		};
+		
+		Private.formatStacktrace = function( strace ) {
+			if( Object.type( strace ) === 'String' ) {
+				var lines = strace.split( /\n/ );
+				
+				if( lines && lines.length ) {
+					return lines.map(function( line ) {
+						var parts = line.split( /@/ );
+						
+						if( parts && parts.length ) {
+							if( Object.type( parts[ 1 ] ) === 'String' ) {
+								return parts[0].substr(0, 40) + '\t->\t' + parts[ 1 ].substr( parts[ 1 ].lastIndexOf( '/' ) ).slice(1, 40);
+							}
+						}
+					}).join( '\n' );
+				}
+			}
 		};
 
 		return Public;

@@ -7,7 +7,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-23
- * Changed: 2011-05-06
+ * Changed: 2011-05-30
  */
 
 !(function _module_wrap( win, doc, undef ) {
@@ -38,8 +38,11 @@
 				msg:	'missing destroy() implementation'
 			});
 		};
+		
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
+		
+		Public.multipleInstances = false;
 			
 		return Public;
 	};

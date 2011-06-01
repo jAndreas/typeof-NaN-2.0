@@ -22,10 +22,11 @@
 		Core.registerSandbox( Sandbox );
 		
 		Core.registerModule( 'Filter', Modules.Filter );
+		Core.registerModule( 'Exception', Modules.Exception );
 		
 		Core.startAll();
 		
-		setTimeout(Core.stopAll, 6000);
+		//setTimeout(Core.stopAll, 6000);
 	}
 	else {
 		throw new ReferenceError( 'PagePreview: unable to resolve necessary application object' ); 

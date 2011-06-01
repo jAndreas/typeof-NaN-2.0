@@ -9,7 +9,7 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-15
- * Modified: 2011-05-09
+ * Modified: 2011-06-01
  */
 
 !(function _toolkit_wrap( win, doc, undef ) {
@@ -73,6 +73,7 @@
 				(function _mapping( oldkey, transmuted ) {
 					if( transmuted && transmuted.length ) {
 						obj[ transmuted[0] || oldkey ] = transmuted[ 1 ];
+						
 						if( transmuted[0] && oldkey !== transmuted[0] ) { 
 							delete obj[ oldkey ];
 						}
@@ -83,39 +84,54 @@
 	};
 	
 	// Object.lookup() - Non-standard. Trys to lookup a chain of objects. When finished we return two possible methods, "execute" & "get".
-	Object.lookup = function _lookup( lookup, failGracefully ) {
-		var check	= null,
-			chain	= [ ],
-			lastkey	= '';
+	Object.lookup = (function _lookup() {
+		var cache = { };
 		
-		if( typeof lookup === 'string' ) {
-			lookup.split( /\./ ).forEach(function _forEach( key, index, arr ) {
-				if( check ) {
-					if( key in check ) {
-						chain.push( check = check[ key ] );
-						lastkey = key;
-					}
-					else {
-						if( !failGracefully ) {
-							throw new TypeError( 'cannot resolve "' + key + '" in ' + lastkey );	
-						}
-					}
+		return function _lookupClosure( lookup, failGracefully ) {
+			var check	= null,
+				chain	= [ ],
+				lastkey	= '';
+			
+			if( typeof lookup === 'string' ) {
+				if( cache[ lookup ] ) {
+					chain = cache[ lookup ].chain;
+					check = cache[ lookup ].check;
 				}
 				else {
-					chain.push( check = win[ key ] );
+					lookup.split( /\./ ).forEach(function _forEach( key, index, arr ) {
+						if( check ) {
+							if( key in check ) {
+								chain.push( check = check[ key ] );
+								lastkey = key;
+							}
+							else {
+								if( !failGracefully ) {
+									throw new TypeError( 'cannot resolve "' + key + '" in ' + lastkey );	
+								}
+							}
+						}
+						else {
+							chain.push( check = win[ key ] );
+						}
+					});
+					
+					cache[ lookup ] = {
+						chain: chain,
+						check: check
+					};
 				}
-			});
-		}
-		
-		return {
-			execute: function _execute() {
-				return typeof check === 'function' ? check.apply( chain[chain.length - 2], arguments ) : null;
-			},
-			get: function _get() {
-				return check;
 			}
-		};
-	};
+			
+			return {
+				execute: function _execute() {
+					return typeof check === 'function' ? check.apply( chain[chain.length - 2], arguments ) : null;
+				},
+				get: function _get() {
+					return check;
+				}
+			};
+		}
+	}());
 	
 	// Array.prototype.indexOf()
 	Array.prototype.indexOf = Array.prototype.indexOf || function _indexOf( search /*, startIndex */ ) {
@@ -185,9 +201,9 @@
 			
 		var t		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
-			res		= [],
+			res		= [ ],
 			i		= 0,
-			thisv	= arguments[1],
+			thisv	= arguments[ 1 ],
 			stored	= null;
 			
 		if( typeof fnc !== 'function' ) { 
@@ -214,12 +230,13 @@
 			
 		var t		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
-			res		= new Array( len ),
+			res		= [ ],
 			i		= 0,
 			thisv	= arguments[ 1 ];
 			
-		if( typeof fnc !== 'function' )
+		if( typeof fnc !== 'function' ) {
 			throw new TypeError( 'Array.prototype.map' );
+		}
 			
 		for(i = 0; i < len; i++) {
 			if( i in t ) {
@@ -232,38 +249,46 @@
 	
 	// Array.prototype.forEach()
 	Array.prototype.forEach = Array.prototype.forEach || function _forEach(fnc /*, thisv */) {
-		if( this === undef || this === null )
+		if( this === undef || this === null ) {
 			throw new TypeError( 'Array.prototype.forEach' );
+		}
 			
-		var t 		= this instanceof Object ? this : new Object( this ),
+		var t		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
+			i		= 0,
 			thisv	= arguments[ 1 ];
 			
-		if( typeof fnc !== 'function' )
+		if( typeof fnc !== 'function' ) {
 			throw new TypeError( 'Array.prototype.forEach' );
+		}
 
 		for(i = 0; i < len; i++) {
-			if( i in t )
+			if( i in t ) {
 				fnc.call( thisv, t[ i ], i, t );
+			}
 		}
 	};
 
 	
 	// Array.prototype.every()	
 	Array.prototype.every = Array.prototype.every || function _every(fnc /*, thisv */) {
-		if( this === undef || this === null )
+		if( this === undef || this === null ) {
 			throw new TypeError( 'Array.prototype.every' );
+		}
 			
-		var t 		= this instanceof Object ? this : new Object( this ),
+		var t		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
+			i		= 0,
 			thisv	= arguments[ 1 ];
 			
-		if( typeof fnc !== 'function' )
+		if( typeof fnc !== 'function' ) {
 			throw new TypeError( 'Array.prototype.every' );
+		}
 			
 		for(i = 0; i < len; i++) {
-			if( i in t && !fnc.call(thisv, t[i], i, t) )
+			if( i in t && !fnc.call(thisv, t[i], i, t) ) {
 				return false;
+			}
 		}
 		
 		return true;
@@ -271,19 +296,23 @@
 	
 	// Array.prototype.some()
 	Array.prototype.some = Array.prototype.some || function _some(fnc /*, thisv */) {
-		if( this === undef || this === null )
+		if( this === undef || this === null ) {
 			throw new TypeError( 'Array.prototype.some' );
+		}
 			
 		var t 		= this instanceof Object ? this : new Object( this ),
 			len		= t.length >>> 0,
+			i		= 0,
 			thisv	= arguments[ 1 ];
 			
-		if( typeof fnc !== 'function' )
+		if( typeof fnc !== 'function' ) {
 			throw new TypeError( 'Array.prototype.some' );
+		}
 			
 		for(i = 0; i < len; i++) {
-			if( i in t && fnc.call(thisv, t[i], i, t) )
+			if( i in t && fnc.call(thisv, t[i], i, t) ) {
 				return true;
+			}
 		}
 		
 		return false;
@@ -334,13 +363,13 @@
 	
 	// if no JSON object is available, try to load json2.js from a local server (which offers the same functionality)
 	if(!( 'JSON' in win ) ) {
-		var script 	= doc.createElement( 'script' ),
-			head 	= doc.head || doc.getElementsByTagName( 'head' )[ 0 ] || doc.documentElement;
+		var script	= doc.createElement( 'script' ),
+			head	= doc.head || doc.getElementsByTagName( 'head' )[ 0 ] || doc.documentElement;
 			
 		script.async	= 'async';
 		script.src		= '/js/components/json2.js';  // needs to get adapted
-		script.type 	= 'text/javascript';
-		script.onload 	= script.onreadystatechange = function _onload_onreadystatechange() {
+		script.type		= 'text/javascript';
+		script.onload	= script.onreadystatechange = function _onload_onreadystatechange() {
 			if(!script.readyState || /loaded|complete/.test( script.readyState ) ) {
 				script.onload = script.onreadystatechange = null;
 				script = undef;
@@ -360,7 +389,7 @@
 		win.console = { };
 		
 		'debug info warn exception assert dir dirxml trace group groupEnd time timeEnd profile profileEnd table log error'.split( /\s/ ).forEach(function( prop ) {
-			console[ prop ] = function() { };
+			win.console[ prop ] = function() { };
 		});
 	}
 }(window, window.document));

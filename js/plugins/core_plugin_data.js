@@ -6,38 +6,34 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-05-18
- * Changed: 2011-05-18
+ * Changed: 2011-05-30
  */
- 
-!(function _core_plugin_data_wrap( win ) {
-	"use strict";
-	var IR = win.ir = win.ir || { },
-		IRcomponents = IR.components = IR.components || { };
 
-	if( Object.hasKeys( IRcomponents, 'Core' ) ) {
-		var Core = IRcomponents.Core;
-		
-		Core.plugin(function _plugin( win, doc, $, Private, Public, Sandbox, PagePreview, undef ) {
-			/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.1 ******** *******/
-			/****** ************************************************** *******/
-			Public.data = function( elem, key, value ) {
-				var rVal = $.data( elem, key, value );
-				
-				return value ? this : rVal;
-			};
-			
-			Public.removeData = function( elem, key ) {
-				$.removeData( elem, key );
-				return this;
-			};
-			
-			Public.hasData = function( elem ) {
-				return $.hasData( elem );
-			};
-		});
-	}
-	else {
-		throw new ReferenceError( 'Plugin: Data -> Core not found.' ); 
-	}
+!(function _core_plugin_ajax_wrap() {
+	"use strict";
 	
-}( window ));
+	Object.lookup( 'ir.components.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, PagePreview, undef ) {
+		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.1 ******** *******/
+		/****** ************************************************** *******/
+		Public.data = function _data( elem, key, value ) {
+			Private.verify( this );
+			
+			var rVal = $.data( elem, key, value );
+			
+			return value ? this : rVal;
+		};
+		
+		Public.removeData = function _removeData( elem, key ) {
+			Private.verify( this );
+			
+			$.removeData( elem, key );
+			return Public;
+		};
+		
+		Public.hasData = function _hasData( elem ) {
+			Private.verify( this );
+			
+			return $.hasData( elem );
+		};
+	});
+}());
