@@ -228,9 +228,11 @@
 					}).join( '\n' );
 				}
 			}
+			
+			return '';
 		};
 
-		return '';
+		return Public;
 	}());
 	
 	IRcomponents.Core = Core;
