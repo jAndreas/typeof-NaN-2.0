@@ -442,7 +442,7 @@
     </target>
     
     
-    <!-- JAVASCRIPT -->
+    <!-- JAVASCRIPT
     <target name="-js.main.concat" depends="-load-build-info" description="(PRIVATE) Concatenates the JS files in dir.js">
         <echo message="Concatenating Main JS scripts..."/>
         <concat destfile="./${dir.publish}/${dir.js}/typeofnan-${build.number}.js">
@@ -452,6 +452,17 @@
                 <exclude name="**/${dir.js.mylibs}/*.js"/>
                 <exclude name="**/${dir.js.libs}/*.js"/>
             </fileset>      
+        </concat>
+    </target>-->
+    
+    <target name="-js.main.concat" depends="-load-build-info" description="(PRIVATE) Concatenates the JS files in dir.js">
+        <echo message="Concatenating Main JS scripts..."/>
+        <concat destfile="./${dir.publish}/${dir.js}/typeofnan-${build.number}.js">
+            <filelist dir="./${dir.publish}/${dir.js}/" files="toolkit.min.js, init.min.js, core.min.js"/>
+            <fileset dir="./${dir.publish}/" excludes="**/toolkit.min.js, **/init.min.js, **/core.min.js">
+                <include name="**/${dir.js.main}/plugins/*.min.js"/>
+            </fileset>
+            <filelist dir="./${dir.publish}/${dir.js}/" files="sandbox.min.js, module.min.js, app.min.js"/>
         </concat>
     </target>
     

@@ -6,7 +6,6 @@
  * Furthermore, the Core is responsible for Module lifecycles, communication between modules,
  * error handling and extensions.
  * 
- * Last thing to mention, the Core should be the only global object (we need someplace to register Modules)
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
@@ -126,7 +125,7 @@
 						type:	'unknown',
 						origin:	'Core',
 						name:	'_stop',
-						msg:	'unable to unload module "' + moduleID + '". Error was: ' + ex.message + '\n\n' + 'Stacktrace: ' + (ex.stack || ex.stacktrace)
+						msg:	'unable to unload module "' + moduleID + '". Error was: ' + ex.message + '\n\n' + 'Stacktrace: ' + Private.formatStacktrace( ex.stack || ex.stacktrace )
 					});
 				}
 			}
@@ -194,7 +193,9 @@
 		};
 		
 		Public.plugin = function _plugin( ext ) {
-			ext.apply( Public, [win, doc, $, Private, Public, Sandbox, Application] );
+			if( typeof ext === 'function' ) {
+				ext.apply( Public, [win, doc, $, Private, Public, Sandbox, Application] );
+			}
 			
 			return Public;
 		};
@@ -229,7 +230,7 @@
 			}
 		};
 
-		return Public;
+		return '';
 	}());
 	
 	IRcomponents.Core = Core;
