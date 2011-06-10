@@ -21,9 +21,8 @@
 	
 		Core.registerSandbox( Sandbox );
 		
-		Core.registerModule( 'Exception', Modules.Exception );
-		Core.registerModule( 'ObjectIssueBox', Modules.ObjectIssueBox );
-		Core.registerModule( 'Filter', Modules.Filter );
+		//Core.registerModule( 'Filter', Modules.Filter );
+		//Core.registerModule( 'Exception', Modules.Exception );
 		
 		Core.startAll();
 		

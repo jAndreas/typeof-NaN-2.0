@@ -2,9 +2,11 @@
  * core_plugin_ajax.js
  * ------------------------------
  * Core plugin: Ajax communication (jQuery abstaction level)
+ * 
+ * This code runs in strict mode (if supported by the environment).
  * ------------------------------
  * Author: Andreas Goebel
- * Date: 2011-05-30
+ * Date: 2011-06-06
  */
 
 !(function _core_plugin_ajax_wrap() {
@@ -16,23 +18,31 @@
 		var TT	= PagePreview.TT;
 		
 		Public.request = function _request( params ) {
-			Private.verify( this );
-			
-			params = params || { };
-			
-			return $.ajax({
-				url:		params.url			|| TT.serverscript,
-				type:		params.type			|| 'POST',
-				dataType:	params.dataType		|| 'json',
-				beforeSend:	params.beforeSend	|| $.noop,
-				data:		$.extend({
-					sid:	TT.sid,
-					rm:		params.rm	|| ''
-				}, params.data || { } ),
-				success:	params.success		|| $.noop,
-				error:		params.error		|| $.noop,
-				complete:	params.complete		|| $.noop
-			});
+			if( Object.type( params ) === 'Object' ) {
+				params = params || { };
+				
+				return $.ajax({
+					url:		params.url			|| TT.serverscript,
+					type:		params.type			|| 'POST',
+					dataType:	params.dataType		|| 'json',
+					beforeSend:	params.beforeSend	|| $.noop,
+					data:		$.extend({
+						sid:	TT.sid,
+						rm:		params.rm	|| ''
+					}, params.data || { } ),
+					success:	params.success		|| $.noop,
+					error:		params.error		|| $.noop,
+					complete:	params.complete		|| $.noop
+				});
+			}
+			else {
+				Public.error({
+					type:	'type',
+					origin:	'Core Plugin Ajax',
+					name:	'_request()',
+					msg:	'Object expected - received "' + getLastError() + '" instead'
+				});
+			}
 		};	
 	});
 }());

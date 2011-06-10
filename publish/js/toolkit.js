@@ -15,8 +15,7 @@
 !(function _toolkit_wrap( win, doc, undef ) {
 	"use strict";
 	
-	var ToStr = Object.prototype.toString,
-		lastError = [ ];
+	var ToStr = Object.prototype.toString;
 	
 	// Date.now()
 	Date.now = Date.now || function _now() {
@@ -38,16 +37,16 @@
 		var res = ToStr.call( obj ).split( ' ' )[ 1 ].replace( ']', '' );
 		
 		if( obj === win ) {
-			res = 'Window';
+			return 'Window';
 		}
 		else if( res === 'Window' || res === 'Global' ) {
-			res = 'Undefined';
+			return 'Undefined';
 		}
 		else if( res.indexOf( 'HTML' ) === 0 ) { 
-			res = 'Node';
+			return 'Node';
 		}
 		
-		return ( setLastError( res ) );
+		return res;
 	};
 	
 	// Object.hasKeys() - Non-standard. Returns true if all keys are available in an object
@@ -343,26 +342,6 @@
 				};
 	}());
 	
-	win.getLastError = function( offset ) {
-		if( typeof offset === 'number' ) {
-			return lastError.slice( offset )[ 0 ];
-		}
-		else {
-			return lastError.slice( -1 )[ 0 ];
-		}
-	};
-	
-	win.setLastError = function( err ) {
-		if( err !== undef ) {
-			if( lastError.length >= 10 ) {
-				lastError.shift();
-			}
-			lastError.push( err );
-			
-			return err;
-		}
-	};
-	
 	// _ie_garbage_collect helps IE<=8 to garbage collect named function expressions. The function assumes that the expression name is
 	// identical to the methodname, with a leading underscore.
 	win._ie_garbage_collect = function( targets ) {
@@ -404,7 +383,7 @@
 	}
 	
 	
-	// create a console object if not availabe and fill it with noop-methods, which the "real" console objects can offer
+	// create a console object if not availabe and fill it with noop-methods, which the "real" console objects offers
 	// this will avoid errors, if there is an access to a console-method on browsers which don't supply a debugger
 	if(!( 'console' in win ) ) {
 		win.console = { };

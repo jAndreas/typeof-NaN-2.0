@@ -3,8 +3,6 @@
  * ------------------------------
  * Core plugin: Data handling (jQuery abstaction level)
  * jQuery data expandos, HTML5 data- Attributes, localStorage & sessionStorage.
- * 
- * This code runs in strict mode (if supported by the environment).
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-05-18
@@ -18,17 +16,23 @@
 		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.1 ******** *******/
 		/****** ************************************************** *******/
 		Public.data = function _data( elem, key, value ) {
+			Private.verify( this );
+			
 			var rVal = $.data( elem, key, value );
 			
 			return value ? this : rVal;
 		};
 		
 		Public.removeData = function _removeData( elem, key ) {
+			Private.verify( this );
+			
 			$.removeData( elem, key );
 			return Public;
 		};
 		
 		Public.hasData = function _hasData( elem ) {
+			Private.verify( this );
+			
 			return $.hasData( elem );
 		};
 	});

@@ -26,7 +26,7 @@
 			};
 
 		Public.name				= 'InterRed Seitenvorschau';
-		Public.version			= 0.65;
+		Public.version			= 0.6;
 	
 		// copy and shortcut some native methods
 		Public.toStr			= Object.prototype.toString;
@@ -90,11 +90,6 @@
 
 					if( name in divStyle ) {
 						ret = cache[ name ] = name;
-						return true;
-					}
-					
-					if( name.toLowerCase() in divStyle ) {
-						ret = cache[ name ] = name.toLowerCase();
 						return true;
 					}
 

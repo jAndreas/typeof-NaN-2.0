@@ -35,7 +35,7 @@
 					type:	'type',
 					origin:	'Core',
 					name:	'_registerApplication',
-					msg:	'object was expected, received ' + getLastError() + ' instead'
+					msg:	'object was expected, received ' + Object.type( app ) + ' instead'
 				});
 			}
 			
@@ -51,7 +51,7 @@
 					type:	'type',
 					origin:	'Core',
 					name:	'_registerSandbox',
-					msg:	'function was expected, received ' + getLastError() + ' instead'
+					msg:	'function was expected, received ' + Object.type( sandbox ) + ' instead'
 				});
 			}
 			
@@ -63,7 +63,7 @@
 				if( !(moduleID in moduleData) ) {
 					moduleData[ moduleID ] = {
 						creator: creator,
-						instances: [ ]
+						instance: null
 					};
 				}
 				else {
@@ -75,14 +75,14 @@
 					});
 				}
 				
-				return Public;
+				return this;
 			}
 			else {
 				Public.error({
 					type:	'type',
 					origin:	'Core',
 					name:	'_registerModule',
-					msg:	'string/function pair expected, received ' + getLastError( -2 ) + '/' + getLastError( -1 ) + ' instead'
+					msg:	'string/function pair expected, received ' + Object.type( moduleID ) + '/' + Object.type( creator ) + ' instead'
 				});
 			}
 			
@@ -93,23 +93,15 @@
 			if( moduleID in moduleData ) {
 				var data = moduleData[ moduleID ];
 				try {
-					if( data.instances && data.instances.length ) {
-						if( data.multipleInstances ) {
-							data.instances.push( data.creator( new Sandbox( this ), Application ) );
-							data.instances.slice( -1 )[ 0 ].init();
-						}
-						else {
-							throw new Error( 'Module "' + moduleID + '" does not allow multiple instances' );
-						}
+					if( data.instance && !data.instance.multipleInstances ) {
+						throw new Error( 'Module "' + moduleID + '" does not allow multiple instances' );
 					}
-					else {
-						data.instances.push( data.creator( new Sandbox( this ), Application ) );
-						data.instances[ 0 ].init();
-						data.multipleInstances = data.instances[ 0 ].multipleInstances;
-					}
+					
+					data.instance = data.creator( new Sandbox( this ), Application );
+					data.instance.init();
 				} catch( ex ) {
 					Public.error({
-						type:	'Unknown',
+						type:	'unknown',
 						origin:	'Core',
 						name:	'_start',
 						msg:	'unable to load module "' + moduleID + '". Error was: ' + ex.message + '\n\n' + 'Stacktrace:\n' + Private.formatStacktrace( ex.stack || ex.stacktrace )
@@ -120,30 +112,17 @@
 			return Public;
 		};
 		
-		Public.stop = function _stop( moduleID, index ) {
+		Public.stop = function _stop( moduleID ) {
 			if( moduleID in moduleData ) {
 				var data = moduleData[ moduleID ];
 				try {
-					if( data.instances && data.instances.length ) {
-						if( !index ) {
-							data.instances.forEach(function( inst ) {
-								inst.destroy();
-								inst = null;	
-							});
-							
-							data.instances = [ ];
-						}
-						else {
-							var inst = data.instances.splice( index, 1 )[ 0 ];
-							if( inst ) {
-								inst.destroy();
-								inst = null;
-							}
-						}
+					if( data.instance ) {
+						data.instance.destroy();
+						data.instance = null;
 					}
 				} catch( ex ) {
 					Public.error({
-						type:	'Unknown',
+						type:	'unknown',
 						origin:	'Core',
 						name:	'_stop',
 						msg:	'unable to unload module "' + moduleID + '". Error was: ' + ex.message + '\n\n' + 'Stacktrace: ' + Private.formatStacktrace( ex.stack || ex.stacktrace )
@@ -173,13 +152,8 @@
 		Public.error = function _error( err ) {
 			if( Object.type( err ) === 'Object' ) {
 				if( typeof err.type === 'string' ) {
-					var output = '\nApplication error\n\n' + 'Origin: ' + (err.origin || 'General') + '\n' + 'Calling context: ' + (err.name || 'Unknown') + '\n' + 'Message: ' +  (err.msg || '');
+					var output = '\n\n' + 'Origin: ' + (err.origin || 'General') + '\n' + 'Calling context: ' + (err.name || 'Unknown') + '\n' + 'Message: ' +  (err.msg || '');
 
-					// backup output. If for some reason the base library lays an outer try/catch around a handler, we've lost our chance to bubble our error
-					win.console.group('App Failure');
-					win.console.info( output );
-					win.console.groupEnd('App Failure');
-					
 					switch( err.type.toLowerCase() ) {
 						case 'type':
 							throw new TypeError( output );
@@ -192,7 +166,7 @@
 					}
 				}
 				else {
-					throw new TypeError( 'Core: error(). String expected - received "' + getLastError() + '" instead.' );
+					throw new TypeError( 'Core: error() called with wrong arguments' );
 				}
 			}
 			
@@ -201,14 +175,20 @@
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^BLOCK END^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		
 		Public.Promise = function _Promise() {
+			Private.verify( this );
+			
 			return $.Deferred.apply( null, arguments );
 		};
 		
 		Public.when	= function _when() {
+			Private.verify( this );
+			
 			return $.when.apply( null, arguments );
 		};
 		
 		Public.extend = function _extend() {
+			Private.verify( this );
+			
 			return $.extend.apply( null, arguments );
 		};
 		
@@ -220,6 +200,17 @@
 			return Public;
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^BLOCK END^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
+		
+		Private.verify = function( ctx ) {
+			if( ctx.sb !== Sandbox ) {
+				Public.error({
+					type:	'reference',
+					origin:	'Core',
+					name:	'verify() -> ' + ( ctx.name || '(no caller available)' ),
+					msg:	'Unauthorized call of Core method. Call this method through the Sandbox only'
+				});
+			}
+		};
 		
 		Private.formatStacktrace = function( strace ) {
 			if( Object.type( strace ) === 'String' ) {
@@ -240,8 +231,6 @@
 			
 			return '';
 		};
-		
-		
 
 		return Public;
 	}());

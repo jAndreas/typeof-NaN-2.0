@@ -11,7 +11,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-06-09
+ * Changed: 2011-05-30
  */
 
 !(function _sandbox_wrap( win, doc, undef ) {
@@ -25,7 +25,10 @@
 			
 		function assign( method ) {
 			if( method in Core && typeof Core[ method ] === 'function' ) {
-				Public[ method ] = Core[ method ];
+				Public[ method ] = function() {
+					// This protecting mechanism is intended to prevent calling a Core method by accident
+					Core[ method ].apply( { sb: Sandbox, name: method }, arguments );
+				};
 			}
 			else {
 				// should we fail silently here instead ?
@@ -42,7 +45,7 @@
 							'listen', 'dispatch', 'forget',	// plugin Communication
 							'request',	// plugin Ajax
 							'Promise', 'when', // Core
-							'$', 'ready', 'contains', // plugin DOM manipulation
+							'$', 'ready', // plugin DOM manipulation
 							'data', 'removeData', 'hasData', // plugin Data
 							'extend' // Core
 		];

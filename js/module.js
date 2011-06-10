@@ -3,11 +3,12 @@
  * -----------------------------------------
  * Basic Module pattern from which other Modules should inherit. A Module should use the Sandbox to complete
  * any application related task. Therefore, the Sandbox needs to abstract all necessary methods.
+ * Furthermore, a module is not allowed to touch any DOM node outside its own area.
  *
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-23
- * Changed: 2011-05-30
+ * Changed: 2011-06-09
  */
 
 !(function _module_wrap( win, doc, undef ) {
@@ -15,9 +16,28 @@
 	var IR = win.ir = win.ir || { },
 		IRcomponents = IR.components = IR.components || { },
 
-	ModuleCtor = function _ModuleCtor( Sandbox, AppRef ) {
-		var Public	= { },
-			Private	= { };
+	ModuleCtor = function _ModuleCtor( Sandbox, AppRef, secret ) {
+		secret	= secret || { };
+		
+		Sandbox.extend( secret, {
+			nodes:			{ },
+			findCachedNode:	function _getNode( nodeRef ) {
+				var thisRef = this,
+					result	= null;
+				
+				Object.keys( thisRef.nodes ).some(function _some( name ) {
+					result = thisRef.nodes[ name ];
+					
+					return result[ 0 ] === nodeRef;
+				});
+				
+				return result;
+			}
+		});
+		
+		var	Public	= { },
+			Private	= { },
+			$$		= Sandbox.$;
 
 		/****** Core Methods (called by the core only) *********** *******/
 		/****** ************************************************** *******/
@@ -42,7 +62,82 @@
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		
+		// A module has to decide if it may launched multiple times
 		Public.multipleInstances = false;
+		
+		// deployAs() decides how a module is installed. static = markup data already available (html,css,images,etc), dynamic = data needs to get loaded, worker = this module has no GUI 
+		Public.deployAs = function _deployAs( deployment, data ) {
+			switch( deployment ) {
+				case 'static':
+					return Private.setupStatic( data );
+				case 'dynamic':
+					return Private.setupSupply( data );
+				case 'worker':
+					return Private.setupWorker( data );
+			}
+		};
+		
+		Public.moduleErrorHandler = function _moduleErrorHandler( ) {
+			var err		= 'Module error:\n',
+				args	= Array.prototype.slice.call( arguments );
+			
+			if( args.length ) {
+				args.forEach(function _forEach( param ) {
+					if( typeof param === 'string' ) {
+						err += ( ', ' + param );
+					}
+				});
+				
+				Sandbox.dispatch({ name: 'AppError', data: err });
+			}
+		};
+		
+		/* -------------------------------------------------------------- */
+
+		// static module setup. On DOMContentLoaded retrieve the modules base node and return the reference. Invokes a promise maker to keeps things asyncronously.
+		Private.setupStatic = function _setupStatic( data ) {
+			console.log('setupStatic()');
+			
+			return Sandbox.Promise(function _setupStaticPromise( promise ) {
+				Sandbox.ready(function _ready() {
+					if( data.rootNode ) {
+						switch( Object.type( data.rootNode ) ) {
+							case 'Function':
+								promise.resolve( data.rootNode() );
+								break;
+							case 'String':
+								promise.resolve( $$( data.rootNode ) );
+								break;
+							default:
+								promise.reject();
+								
+								Sandbox.error({
+									type:	'reference',
+									origin:	'Module Constructor',
+									name:	'_setupStatic',
+									msg:	'expected a function or selector string, received "' + getLastError() + '" instead'
+								});
+						}
+					}
+					else {
+						Sandbox.error({
+							type:	'reference',
+							origin:	'Module Constructor',
+							name:	'_setupStatic',
+							msg:	'deployment data for a static module requires a root node as method or selector string'
+						});
+					}
+				});
+			}).promise();
+		};
+		
+		Private.setupSupply = function _setupSupply() {
+			console.log('setupSupply()');
+		};
+		
+		Private.setupWorker = function _setupWorker() {
+			console.log('setupWorker()');
+		};
 			
 		return Public;
 	};

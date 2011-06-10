@@ -8,12 +8,10 @@
  * 		name: <name of event>,
  * 		data: <any data>
  * }
- * 
- * This code runs in strict mode (if supported by the environment).
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-05-04
- * Changed: 2011-06-06
+ * Changed: 2011-06-01
  */
 
 !(function _core_plugin_ajax_wrap() {
@@ -23,6 +21,8 @@
 		Private.messagePool = { };
 
 		Public.dispatch = function _dispatch( messageInfo ) {
+			Private.verify( this );
+			
 			if( Object.type( messageInfo ) === 'Object' ) {
 				if( typeof messageInfo.name === 'string' ) {
 					if( messageInfo.name in Private.messagePool ) {
@@ -62,6 +62,8 @@
 		};
 
 		Public.listen = function _listen( eventName, callback, scope ) {
+			Private.verify( this );
+			
 			if( Object.type( eventName ) !== 'Array' ) {
 				eventName = [ eventName ];
 			}
@@ -80,7 +82,7 @@
 						type:	'syntax',
 						origin:	'Core COM',
 						name:	'_listen',
-						msg:	'expected a string value (or an Array of strings), received "' + typeof event + '" instead'
+						msg:	'expected a string value (or an Array of strings), received ' + Object.type( event ) + ' instead'
 					});
 				}
 			});
@@ -89,13 +91,15 @@
 		};
 		
 		Public.forget = function _forget( eventName, callback ) {
-			if( Object.type( eventName ) !== 'Array' ) {
-				eventName = [ eventName ];
-			}
+			Private.verify( this );
 			
-			eventName.forEach(function( event ) {
-				if( typeof event === 'string' ) {
-					if( Private.messagePool[ event ] && Object.type( Private.messagePool[ event ] ) === 'Array' ) {
+			if( Private.messagePool[ eventName ] && Object.type( Private.messagePool[ eventName ] ) === 'Array' ) {
+				if( Object.type( eventName ) !== 'Array' ) {
+					eventName = [ eventName ];
+				}
+				
+				eventName.forEach(function( event ) {
+					if( typeof event === 'string' ) {
 						if( callback === undef ) {
 							Private.messagePool[ event ] = [ ];
 						}
@@ -105,16 +109,16 @@
 							});
 						}
 					}
-				}
-				else {
-					Public.error({
-						type:	'syntax',
-						origin:	'Core COM',
-						name:	'_forget',
-						msg:	'expected a string value (or an Array of strings)'
-					});
-				}
-			});
+					else {
+						Public.error({
+							type:	'syntax',
+							origin:	'Core COM',
+							name:	'_forget',
+							msg:	'expected a string value (or an Array of strings)'
+						});
+					}
+				});
+			}
 			
 			return Public;
 		};
