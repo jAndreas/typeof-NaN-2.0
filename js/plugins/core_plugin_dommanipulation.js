@@ -7,7 +7,7 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-05-03
- * Changed: 2011-05-30
+ * Changed: 2011-06-14
  */
 
 !(function _core_plugin_ajax_wrap() {
@@ -134,6 +134,10 @@
 				$.fn.removeAttr.apply( this, arguments );
 				return this;
 			},
+			empty: function _empty() {
+				$.fn.empty.apply( this, arguments );
+				return this;
+			},
 			is: function _is( check ) {
 				var confirmed = some.call( this, function( elem ) {
 					return !!Public.data( elem, check );
@@ -201,14 +205,14 @@
 								type:	'type',
 								origin:	'Core DOM', 
 								name:	'_animate()',
-								msg:	'object/number expected, received ' + getLastError( -2 ) + '/' + getLastError( -1 ) + ' instead'
+								msg:	'object/number expected, received ' + win.getLastError( -2 ) + '/' + win.getLastError( -1 ) + ' instead'
 							});
 						}
 					};
 				}
 				else {
 					return function _animate( props, duration, callback ) {
-						var that 		= this;
+						var that		= this;
 						
 						$.fn.animate.apply( that, arguments );
 						

@@ -71,6 +71,7 @@
 			}()));
 			
 			Private.bindDOMevents();
+			Private.initElement();
 		};
 		
 		// bindDOMevents will take care of browser DOM level events
@@ -86,9 +87,12 @@
 				});
 			}
 		};
+		
+		Private.initElements = function _initElements() {
+		};
 			
 		return Public;
 	};
 	
-	Modules.ObjectIssueBox = ObjectIssueBox;
+	Modules.TEMPLATE = TEMPLATE;
 }( window, window.document ));
