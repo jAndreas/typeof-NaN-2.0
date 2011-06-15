@@ -16,7 +16,7 @@
 	Object.lookup( 'ir.components.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, PagePreview, undef ) {
 		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.1 ******** *******/
 		/****** ************************************************** *******/
-		var push	= Array.prototype.push,
+		var	push	= Array.prototype.push,
 			slice	= Array.prototype.slice,
 			each	= Array.prototype.forEach,
 			some	= Array.prototype.some,
@@ -126,6 +126,21 @@
 			show: function _show() {
 				return this.css( 'display', 'block' );
 			},
+			val: function _val() {
+				var result = $.fn.val.apply( this, arguments );
+				
+				return arguments.length > 1 ? this : result;
+			},
+			text: function _text() {
+				var result = $.fn.text.apply( this, arguments );
+				
+				return arguments.length > 1 ? this : result;
+			},
+			html: function _html() {
+				var result = $.fn.html.apply( this, arguments );
+				
+				return arguments.length > 1 ? this : result;
+			},
 			attr: function _attr() {
 				$.fn.attr.apply( this, arguments );
 				return this;
@@ -148,15 +163,19 @@
 			css: function _css( prop, value ) {
 				if( value === "" || value || Object.type( prop ) === 'Object' ) {
 					if( value ) {
-						$.fn.css.call( slice.call( this, 0 ), prop, value );
+						$.fn.css.call( slice.call( this, 0 ), PagePreview.createCSS( prop ), value );
 					}
 					else {
+						Object.map( prop, function( prop, value ) {
+							return [ PagePreview.createCSS( prop ), value ];	
+						});
+						
 						$.fn.css.call( slice.call( this, 0 ), prop );
 					}
 					return this;	
 				}
 				else {
-					return $.fn.css.call( slice.call( this, 0 ), prop );
+					return $.fn.css.call( slice.call( this, 0 ), PagePreview.createCSS( prop ) );
 				}
 			},
 			animate: (function _animateAdvancedConditional() {
@@ -194,7 +213,7 @@
 										else {
 											myElem.stopAnimation = null;
 										}
-									}, duration + 200));
+									}, duration + 50));
 								}( elem ));
 							});
 							
@@ -241,14 +260,13 @@
 							Public.data( elem, 'animationTimer', [ ] );
 							
 							if( jumpToEnd ) {
-								/*setTimeout(function() {
+								setTimeout(function() {
 									if( elem.aniprops ) {
 										for( var prop in elem.aniprops ) {
-											console.log(prop, ': ', elem.aniprops[prop]);
-											$.fn.css.call( [ elem ], prop, parseInt(elem.aniprops[prop])+0.1 );
+											$.fn.css.call( [ elem ], prop, elem.aniprops[prop] );
 										}
 									}
-								}, 1);*/
+								}, 1);
 							}
 						});
 						

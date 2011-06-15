@@ -20,6 +20,11 @@
 					var res = $.fn.autocomplete.apply( this, arguments );
 					
 					return arguments.length > 1 ? res : this;
+				},
+				effect:			function _effect() {
+					$.fn.effect.apply( this, arguments );
+					
+					return this;
 				}
 			});
 		}

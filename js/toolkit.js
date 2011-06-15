@@ -47,7 +47,7 @@
 			res = 'Node';
 		}
 		
-		return ( setLastError( res ) );
+		return ( win.setLastError( res ) );
 	};
 	
 	// Object.hasKeys() - Non-standard. Returns true if all keys are available in an object
