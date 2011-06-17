@@ -9,7 +9,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-05-16
+ * Changed: 2011-06-16
  */
 
 !(function _core_wrap( win, doc, $, undef ) {
@@ -59,7 +59,7 @@
 		};
 		
 		Public.registerModule = function _registerModule( moduleID, creator ) {
-			if( typeof moduleID === 'string' && typeof creator === 'function' ) {
+			if( Object.type( moduleID ) === 'String' && Object.type( creator ) === 'Function' ) {
 				if( !(moduleID in moduleData) ) {
 					moduleData[ moduleID ] = {
 						creator: creator,

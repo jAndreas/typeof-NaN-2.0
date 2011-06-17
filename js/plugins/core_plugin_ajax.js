@@ -6,7 +6,7 @@
  * This code runs in strict mode (if supported by the environment).
  * ------------------------------
  * Author: Andreas Goebel
- * Date: 2011-06-06
+ * Date: 2011-06-17
  */
 
 !(function _core_plugin_ajax_wrap() {
@@ -19,8 +19,6 @@
 		
 		Public.request = function _request( params ) {
 			if( Object.type( params ) === 'Object' ) {
-				params = params || { };
-				
 				return $.ajax({
 					url:		params.url			|| TT.serverscript,
 					type:		params.type			|| 'POST',
@@ -40,9 +38,13 @@
 					type:	'type',
 					origin:	'Core Plugin Ajax',
 					name:	'_request()',
-					msg:	'Object expected - received "' + getLastError() + '" instead'
+					msg:	'Object expected - received "' + win.getLastError() + '" instead'
 				});
 			}
-		};	
+		};
+		
+		Public.getJSON = function _getJSON( ) {
+			return $.getJSON.apply( null, arguments );
+		};
 	});
 }());

@@ -190,16 +190,24 @@
 								return [ PagePreview.createCSS( key ), value ];
 							});
 							
+							// check if we got passed in an 'easing string' without a callback.
+							if( Object.type( callback ) === 'String' ) {
+								easing = callback;
+							}
+							
 							each.call( that, function _eaching( elem ) {
 								css.call( [ elem ], transition, 'all ' + duration/1000 + 's ' + (easing && typeof easing === 'string' ? easing : 'ease' ) );
 								css.call( [ elem ], elem.aniprops = props );
 								
+								// create the data property 'animationTimier' on the current element its not present already
 								if( Object.type( Public.data( elem, 'animationTimer' ) !== 'Array' ) ) {
 									Public.data( elem, 'animationTimer', [ ] );
 								}
 								Public.data( elem, 'animated', true );
 								elem.stopAnimation = null;
 								
+								// invoke a new function(-context) to avoid that all timeout callbacks would closure the same variable
+								// store the timeout id in the 'animationTimer' array which is a data property
 								(function _freeClosure( myElem ) {
 									Public.data( elem, 'animationTimer').push(setTimeout(function _animationDelay() {
 										// TODO: initialize an interval which checks if there still are css prop deltas to be more accurate. 
@@ -282,6 +290,10 @@
 					};
 				}
 			}()),
+			jQstop: function _jQstop() {
+				$.fn.stop.apply( this, arguments );
+				return this;
+			},
 			slice: function _slice() {
 				var newRef	= this.constructor(),
 					args	= arguments;

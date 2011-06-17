@@ -7,7 +7,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-06-08
- * Changed: 2011-06-08
+ * Changed: 2011-06-16
  */
 
 !(function _module_TEMPLATE_wrap( win, doc, undef ) {
@@ -19,7 +19,7 @@
 	TEMPLATE = function _TEMPLATE( Sandbox, PagePreview, secret ) {
 		secret	= secret || { };
 		
-		var	Public	= IRcomponents.ModuleCtor( Sandbox, PagePreview ) || { }, // inherit from "Module Base Pattern"
+		var	Public	= IRcomponents.ModuleCtor( Sandbox, PagePreview, secret ) || { }, // inherit from "Module Base Pattern"
 			Private	= { 
 				deploymentData: { 
 					rootNode: <METHOD> or <SELECTOR STRING>
@@ -38,6 +38,7 @@
 		
 		Public.destroy = function _destroy() {
 			Private.nodes = { };
+			Sandbox.forget( [ 'EXAMPLE_EVENT_1', 'EXAMPLE_EVENT_2' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
@@ -45,7 +46,7 @@
 		// eventHandler takes care of application level events
 		Private.eventHandler = function _eventHandler( event ) {
 			var	originalEv	= event.data.originalEvent,
-				rootNode	= Private.nodes.rootNode;
+				rootNode	= secret.nodes.rootNode;
 			
 			switch( event.name ) {
 				case 'EXAMPLE_EVENT_1':
@@ -71,12 +72,12 @@
 			}()));
 			
 			Private.bindDOMevents();
-			Private.initElement();
+			Private.initElements();
 		};
 		
 		// bindDOMevents will take care of browser DOM level events
 		Private.bindDOMevents = function _bindDOMevents() {
-			var nodes = Private.nodes;
+			var nodes = secret.nodes;
 			
 			if( nodes ) {
 				nodes.rootNode.bind( 'mouseleave', function( event ) {

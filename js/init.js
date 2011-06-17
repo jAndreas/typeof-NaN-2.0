@@ -7,7 +7,7 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-05-16
+ * Changed: 2011-06-16
  */
 
 !(function _init_wrap( win, doc, undef ) {
@@ -26,7 +26,7 @@
 			};
 
 		Public.name				= 'InterRed Seitenvorschau';
-		Public.version			= 0.65;
+		Public.version			= 0.67;
 	
 		// copy and shortcut some native methods
 		Public.toStr			= Object.prototype.toString;
@@ -68,7 +68,7 @@
 		
 		// createCSS returns a cross-browser compatible CSS string. For instance, .createCSS('boxShadow') returns "MozBoxShadow" in FF<4 while in WebKit browsers the result is just "boxShadow"
 		Public.createCSS = (function _createCSS() {
-			var div				= doc.createElement('div'),
+			var div				= doc.createElement( 'div' ),
 				divStyle		= div.style,
 				ret				= null,
 				cache			= { };
@@ -114,6 +114,30 @@
 				});
 
 				return ret;
+			};
+		}());
+		
+		// helper method which lookups an autocomplete data source array for a specific .label and returns the aproper .id property
+		Public.getIdByLabel = (function _getIdByLabel() {
+			var cache = { };
+			
+			return function _getIdbyLabelClosure( src, label ) {
+				if( label in cache ) { return cache[ label ]; }
+				
+				if( Object.type( src ) === 'Array' ) {
+					var result = null;
+					
+					src.some(function _some( entry ) {
+						result = entry.id;
+						return entry.label === label;
+					});
+					
+					if( result ) {
+						cache[ label ] = result;	
+					}
+					
+					return result;
+				}
 			};
 		}());
 

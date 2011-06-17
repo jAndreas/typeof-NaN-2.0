@@ -11,7 +11,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-06-09
+ * Changed: 2011-06-17
  */
 
 !(function _sandbox_wrap( win, doc, undef ) {
@@ -40,7 +40,7 @@
 		
 		Private.access = [	'error',	// Core
 							'listen', 'dispatch', 'forget',	// plugin Communication
-							'request',	// plugin Ajax
+							'request', 'getJSON',	// plugin Ajax
 							'Promise', 'when', // Core
 							'$', 'ready', 'contains', // plugin DOM manipulation
 							'data', 'removeData', 'hasData', // plugin Data

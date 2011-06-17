@@ -8,7 +8,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-23
- * Changed: 2011-06-09
+ * Changed: 2011-06-16
  */
 
 !(function _module_wrap( win, doc, undef ) {
@@ -61,7 +61,7 @@
 							}
 							
 							if( originNode.is( ':visible' ) ) {
-								originNode.effect( 'transfer', {
+								originNode.jQstop().effect( 'transfer', {
 									to:			node[ 0 ],
 									className:	'transferBorder'
 								}, 400);
@@ -104,7 +104,7 @@
 				case 'static':
 					return Private.setupStatic( data );
 				case 'dynamic':
-					return Private.setupSupply( data );
+					return Private.setupDynamic( data );
 				case 'worker':
 					return Private.setupWorker( data );
 			}
@@ -117,7 +117,15 @@
 			if( args.length ) {
 				args.forEach(function _forEach( param ) {
 					if( typeof param === 'string' ) {
-						err += ( ', ' + param );
+						err += ( '\n' + param );
+					}
+					else if( typeof param === 'object' ) {
+						if( param.responseText ) {
+							// The <center> cannot hold it is too late....
+							var data = param.responseText.split( /<.*?>/ );
+							
+							err += '\n' + data[ 4 ] + '\n' + data[ 10 ];
+						}
 					}
 				});
 				
@@ -148,7 +156,7 @@
 									type:	'reference',
 									origin:	'Module Constructor',
 									name:	'_setupStatic',
-									msg:	'expected a function or selector string, received "' + getLastError() + '" instead'
+									msg:	'expected a function or selector string, received "' + win.getLastError() + '" instead'
 								});
 						}
 					}
@@ -164,8 +172,8 @@
 			}).promise();
 		};
 		
-		Private.setupSupply = function _setupSupply() {
-			console.log('setupSupply()');
+		Private.setupDynamic = function _setupDynamic() {
+			console.log('setupDynamic()');
 		};
 		
 		Private.setupWorker = function _setupWorker() {
