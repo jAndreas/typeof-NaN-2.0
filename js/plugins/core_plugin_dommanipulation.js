@@ -13,7 +13,7 @@
 !(function _core_plugin_ajax_wrap() {
 	"use strict";
 	
-	Object.lookup( 'ir.components.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, PagePreview, undef ) {
+	Object.lookup( 'BarFoos.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, App, undef ) {
 		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.1 ******** *******/
 		/****** ************************************************** *******/
 		var	push	= Array.prototype.push,
@@ -78,9 +78,13 @@
 				var newRef	= this.constructor(),
 					args	= arguments;
 				
+				newRef.prevRef = this;
 				push.apply( newRef, $.fn.find.apply( this, arguments ).get() );
 				
 				return newRef;
+			},
+			end: function _end() {
+				return this.prevRef || this.constructor( null );
 			},
 			prev: function _prev() {
 				var newRef	= this.constructor(),
@@ -115,6 +119,9 @@
 			bind: function _bind( ev, handler ) {
 				$.fn.bind.call( this, ev, handler );
 				return this;	
+			},
+			trigger: function _trigger() {
+				$.fn.trigger.apply( this, arguments );
 			},
 			unbind: function _unbind( node, ev, handler ) {
 				$.fn.unbind.call( this, ev, handler );
@@ -160,14 +167,26 @@
 				
 				return ( confirmed || $.fn.is.apply( this, arguments ) );
 			},
+			addClass: function _addClass() {
+				$.fn._addClass.apply( this, arguments );
+				return this;
+			},
+			removeClass: function _removeClass() {
+				$.fn._removeClass.apply( this, arguments );
+				return this;
+			},
+			toggleClass: function _toggleClass() {
+				$.fn.toggleClass.apply( this, arguments );
+				return this;
+			},
 			css: function _css( prop, value ) {
 				if( value === "" || value || Object.type( prop ) === 'Object' ) {
 					if( value ) {
-						$.fn.css.call( slice.call( this, 0 ), PagePreview.createCSS( prop ), value );
+						$.fn.css.call( slice.call( this, 0 ), App.createCSS( prop ), value );
 					}
 					else {
 						Object.map( prop, function( prop, value ) {
-							return [ PagePreview.createCSS( prop ), value ];	
+							return [ App.createCSS( prop ), value ];	
 						});
 						
 						$.fn.css.call( slice.call( this, 0 ), prop );
@@ -175,19 +194,21 @@
 					return this;	
 				}
 				else {
-					return $.fn.css.call( slice.call( this, 0 ), PagePreview.createCSS( prop ) );
+					return $.fn.css.call( slice.call( this, 0 ), App.createCSS( prop ) );
 				}
 			},
 			animate: (function _animateAdvancedConditional() {
-				var	transition		= PagePreview.createCSS('Transition');
+				var	transition		= App.createCSS('Transition');
 				
 				if(transition ) {
 					return function _animate( props, duration, callback, easing ) {
-						var that	= this;
+						var that	= this,
+							args	= arguments;
 
 						if( Object.type( props ) === 'Object' && Object.type( duration ) === 'Number' ) {
+							// map passed css propertys into browser natives
 							Object.map( props, function _mapping( key, value ) {
-								return [ PagePreview.createCSS( key ), value ];
+								return [ App.createCSS( key ), value ];
 							});
 							
 							// check if we got passed in an 'easing string' without a callback.
@@ -195,34 +216,54 @@
 								easing = callback;
 							}
 							
+							// apply animation on each element in our wrapped set
 							each.call( that, function _eaching( elem ) {
-								css.call( [ elem ], transition, 'all ' + duration/1000 + 's ' + (easing && typeof easing === 'string' ? easing : 'ease' ) );
-								css.call( [ elem ], elem.aniprops = props );
-								
-								// create the data property 'animationTimier' on the current element its not present already
-								if( Object.type( Public.data( elem, 'animationTimer' ) !== 'Array' ) ) {
-									Public.data( elem, 'animationTimer', [ ] );
+								// if the element is currently animated by us, push the arguments into it's "animQueue" array for later execution
+								if( Public.data( elem, 'animated' ) ) {
+									Public.data( elem, 'animQueue' ).push( args );
 								}
-								Public.data( elem, 'animated', true );
-								elem.stopAnimation = null;
+								else {
+									// apply the transition property along with the duration and easing, also set the css property for animation
+									css.call( [ elem ], transition, 'all ' + duration/1000 + 's ' + (easing && typeof easing === 'string' ? easing : 'ease' ) );
+									css.call( [ elem ], elem.aniprops = props );
 								
-								// invoke a new function(-context) to avoid that all timeout callbacks would closure the same variable
-								// store the timeout id in the 'animationTimer' array which is a data property
-								(function _freeClosure( myElem ) {
-									Public.data( elem, 'animationTimer').push(setTimeout(function _animationDelay() {
-										// TODO: initialize an interval which checks if there still are css prop deltas to be more accurate. 
-										css.call( [ myElem ], transition, '' );
-										
-										Public.removeData( myElem, 'animated' );
-	
-										if( typeof callback === 'function' && !myElem.stopAnimation ) {
-											callback.apply( myElem, [  ] );
-										}
-										else {
-											myElem.stopAnimation = null;
-										}
-									}, duration + 50));
-								}( elem ));
+									// create the data property 'animationTimier' on the current element if its not present already
+									if( Object.type( Public.data( elem, 'animationTimer' ) ) !== 'Array' ) {
+										Public.data( elem, 'animationTimer', [ ] );
+									}
+									// create the data property 'animQueue' on the current elements if its not present already
+									if( Object.type( Public.data( elem, 'animQueue' ) ) !== 'Array' ) {
+										Public.data( elem, 'animQueue', [ ] );
+									}
+									
+									Public.data( elem, 'animated', true );
+									elem.stopAnimation = null;
+									
+									// invoke a new function(-context) to avoid that all timeout callbacks would closure the same variable
+									// store the timeout id in the 'animationTimer' array which is a data property
+									(function _freeClosure( myElem ) {
+										Public.data( myElem, 'animationTimer').push(setTimeout(function _animationDelay() {
+											// TODO: initialize an interval which checks if there still are css prop deltas to be more accurate. 
+											css.call( [ myElem ], transition, '' );
+											
+											Public.removeData( myElem, 'animated' );
+											
+											// if elements animQueue is available and not empty, execute outstanding animations first
+											if( Object.type( Public.data( myElem, 'animQueue') ) === 'Array' && Public.data( myElem, 'animQueue' ).length ) {
+												_animate.apply( that, Public.data( myElem, 'animQueue').shift() );
+											}
+											else {
+												if( typeof callback === 'function' && !myElem.stopAnimation ) {
+													callback.apply( myElem, [  ] );
+												}
+												else {
+													myElem.stopAnimation = null;
+												}
+											}
+										}, duration + 50));
+									}( elem ));
+								}
+								
 							});
 							
 							return that;
@@ -248,7 +289,7 @@
 				}
 			}()),
 			stop: (function _stopAdvancedConditional() {
-				var transition	= PagePreview.createCSS('Transition');
+				var transition	= App.createCSS('Transition');
 				
 				if( transition ) {
 					return function _stop( jumpToEnd ) {
@@ -265,7 +306,13 @@
 								});
 							}
 							
+							// clear queued animation requests
+							if( Object.type( Public.data( elem, 'animQueue' ) ) === 'Array' ) {
+								Public.data( elem, 'animQueue', [ ] );
+							}
+							
 							Public.data( elem, 'animationTimer', [ ] );
+							Public.removeData( elem, 'animated' );
 							
 							if( jumpToEnd ) {
 								setTimeout(function() {
@@ -328,6 +375,12 @@
 				
 				return this;
 			},
+			prepend: function _prepend() {
+				$.fn.prepend.apply( this, arguments );
+			},
+			prependTo: function _prependTo() {
+				$.fn.prependTo.apply( this, arguments );
+			},
 			after: function _after() {
 				$.fn.after.apply( this, arguments );
 				
@@ -355,6 +408,12 @@
 			},
 			outerHeight: function _outerHeight() {
 				return $.fn.outerHeight.apply( this, arguments );
+			},
+			scrollTop: function _scrollTop() {
+				return $.fn.scrollTop.apply( this, arguments );
+			},
+			scrollLeft: function _scrollLeft() {
+				return $.fn.scrollLeft.apply( this, arguments );
 			},
 			delay: function _delay( duration, method /* , arguments */ ) {
 				var that	= this,

@@ -12,14 +12,14 @@
  * This code runs in strict mode (if supported by the environment).
  * ------------------------------
  * Author: Andreas Goebel
- * Date: 2011-05-04
- * Changed: 2011-06-06
+ * Date: 2011-06-18
+ * Changed: 2011-06-18
  */
 
 !(function _core_plugin_ajax_wrap() {
 	"use strict";
 	
-	Object.lookup( 'ir.components.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, PagePreview, undef ) {
+	Object.lookup( 'BarFoos.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, App, undef ) {
 		Private.messagePool = { };
 
 		Public.dispatch = function _dispatch( messageInfo ) {

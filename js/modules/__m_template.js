@@ -7,25 +7,23 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-06-08
- * Changed: 2011-06-16
+ * Changed: 2011-06-21
  */
 
 !(function _module_TEMPLATE_wrap( win, doc, undef ) {
 	"use strict";
-	var IR = win.ir = win.ir || { },
-		IRcomponents = IR.components = IR.components || { },
-		Modules = IRcomponents.Modules = IRcomponents.Modules || { },
+	var	BF		= win.BarFoos = win.BarFoos || { },
+		Modules = BF.Modules = BF.Modules || { },
 	
-	TEMPLATE = function _TEMPLATE( Sandbox, PagePreview, secret ) {
+	TEMPLATE = function _TEMPLATE( Sandbox, App, secret ) {
 		secret	= secret || { };
 		
-		var	Public	= IRcomponents.ModuleCtor( Sandbox, PagePreview, secret ) || { }, // inherit from "Module Base Pattern"
+		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
 			Private	= { 
 				deploymentData: { 
 					rootNode: <METHOD> or <SELECTOR STRING>
 					}
-				},
-				nodes: { }
+				}
 			};
 
 		/****** Core Methods (called by the core only) *********** *******/
@@ -37,7 +35,8 @@
 		};
 		
 		Public.destroy = function _destroy() {
-			Private.nodes = { };
+			secret.clearNodeBindings();
+			
 			Sandbox.forget( [ 'EXAMPLE_EVENT_1', 'EXAMPLE_EVENT_2' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
@@ -58,9 +57,9 @@
 			}
 		};
 		
-		// cacheElements() extends Private.nodes with DOM element references
+		// cacheElements() extends secret.nodes with DOM element references
 		Private.cacheElements = function _cacheElements( rootNode ) {
-			Sandbox.extend( Private.nodes, (function _acquireNodes() {
+			Sandbox.extend( secret.nodes, (function _acquireNodes() {
 				var EXAMPLE_NODE	= rootNode.find('#EXAMPLE_NODE'),
 					FOO_BAR			= rootNode.find('#FOO_BAR');
 					

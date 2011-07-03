@@ -1,71 +1,36 @@
 /* 
- * init.js (PagePreview)
+ * init.js (ExampleApp)
  * ------------------------------
  * Application init script, creates more App specific methods and abstractions.
  * 
  * This code runs in strict mode (if supported by the environment).
  * ------------------------------
  * Author: Andreas Goebel
- * Date: 2011-03-17
- * Changed: 2011-06-16
+ * Date: 2011-06-18
+ * Changed: 2011-06-18
  */
 
 !(function _init_wrap( win, doc, undef ) {
 	"use strict";
-	var IR = win.ir = win.ir || { },
-		IRapps = IR.apps = IR.apps || { },
-		IRcomponents = IR.components = IR.components || { },
-		Core = IRcomponents.Core,
+	var	BF = win.BarFoos = win.BarFoos || { },
+		BFapps = BF.apps = BF.apps || { },
+		Core = BF.Core,
 
-	PagePreview = (function _PagePreview() {
+	ExampleApp = (function _ExampleApp() {
 		var	Public				= { },
 			Private				= {
-				// object to store Template Toolkit passed data
-				TemplateToolkit: win.TemplateToolkit || { },
 				isJSON:	/^(?:\{.*\}|\[.*\])$/	// JSON validation regex
 			};
 
-		Public.name				= 'InterRed Seitenvorschau';
-		Public.version			= 0.67;
+		Public.name			= 'An example application init script';
+		Public.version			= 0.01;
 	
 		// copy and shortcut some native methods
 		Public.toStr			= Object.prototype.toString;
 		Public.hasOwn			= Object.prototype.hasOwnProperty;
-		Public.type				= Object.type;
-		Public.ua				= navigator.userAgent;
+		Public.type			= Object.type;
+		Public.ua			= navigator.userAgent;
 				
-		// set a Template Toolkit variable
-		Public.setTTvar			= function _setTTvar() {
-			if( arguments.length ) {
-				var arg = arguments[ 0 ];
-				if( Public.type( arg ) === 'Object' ) {
-					Object.keys( arg ).forEach(function _forEach( key ) {
-						Private.TemplateToolkit[ key ] = Private.isJSON.test( arg[ key ] ) ? JSON.parse( arg[ key ] ) : arg[ key ]; 
-					});
-				}
-				else if( typeof arg === 'string' && typeof arguments[ 1 ] === 'string' ) {
-					var value = arguments[ 1 ];
-					Private.TemplateToolkit[ arg ] = Private.isJSON.test( value ) ? JSON.parse( value ) : value;
-				}
-				else { 
-					Core.error({
-						type:	'type',
-						origin:	'App init',
-						name:	'_setTTvar()',
-						msg:	'object or string/string arguments expected, received' + Object.type( arg ) + '/' + Object.type( arguments[ 1 ] ) + ' instead'
-					});
-				}
-			}
-		};
-
-		// get a Template Toolkit variable, create a shortcut method aswell
-		Public.getTTvar			= Public.T = function _getTTvar( key ) {
-			return Private.TemplateToolkit[ key ];
-		};
-
-		// also, expose the data container directly (TODO: reconsider this.)
-		Public.TT				= Private.TemplateToolkit;
-		
 		// createCSS returns a cross-browser compatible CSS string. For instance, .createCSS('boxShadow') returns "MozBoxShadow" in FF<4 while in WebKit browsers the result is just "boxShadow"
 		Public.createCSS = (function _createCSS() {
 			var div				= doc.createElement( 'div' ),
@@ -117,37 +82,13 @@
 			};
 		}());
 		
-		// helper method which lookups an autocomplete data source array for a specific .label and returns the aproper .id property
-		Public.getIdByLabel = (function _getIdByLabel() {
-			var cache = { };
-			
-			return function _getIdbyLabelClosure( src, label ) {
-				if( label in cache ) { return cache[ label ]; }
-				
-				if( Object.type( src ) === 'Array' ) {
-					var result = null;
-					
-					src.some(function _some( entry ) {
-						result = entry.id;
-						return entry.label === label;
-					});
-					
-					if( result ) {
-						cache[ label ] = result;	
-					}
-					
-					return result;
-				}
-			};
-		}());
-
 		return Public;
 	}());
 
 	if( Core ) {
-		Core.registerApplication( IRapps.PagePreview = PagePreview );
+		Core.registerApplication( BFapps.ExampleApp = ExampleApp );
 	}
 	else {
-		throw new TypeError( 'PagePreview init: Core not available - aborting.' );
+		throw new TypeError( 'ExampleApp init: Core not available - aborting.' );
 	}
 }( window, window.document ));

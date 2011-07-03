@@ -7,14 +7,14 @@
  * This code runs in strict mode (if supported by the environment).
  * ------------------------------
  * Author: Andreas Goebel
- * Date: 2011-05-18
- * Changed: 2011-05-30
+ * Date: 2011-06-18
+ * Changed: 2011-06-18
  */
 
 !(function _core_plugin_ajax_wrap() {
 	"use strict";
 	
-	Object.lookup( 'ir.components.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, PagePreview, undef ) {
+	Object.lookup( 'BarFoos.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, App, undef ) {
 		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.1 ******** *******/
 		/****** ************************************************** *******/
 		Public.data = function _data( elem, key, value ) {

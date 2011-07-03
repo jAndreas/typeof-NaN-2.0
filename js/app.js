@@ -1,37 +1,31 @@
 /* 
- * app.js (PagePreview)
+ * app.js ( Example )
  * ------------------------------
- * Page Preview Application - Wire things up
+ * Example Application - Wire things up
  * ------------------------------
  * Author: Andreas Goebel
- * Date: 2011-03-23
- * Changed: 2011-05-06
+ * Date: 2011-06-18
+ * Changed: 2011-06-18
  */
  
 !(function _application_wrap( win ) {
 	"use strict";
-	var IR = win.ir = win.ir || { },
-		IRcomponents = IR.components = IR.components || { },
-		IRapps = IR.apps = IR.apps || { };
+	var	BF = win.BarFoos = win.BarFoos || { },
+		BFapps = BF.apps = BF.apps || { };
 
-	if( Object.hasKeys( IRcomponents, 'Core Sandbox' ) && Object.hasKeys( IRapps, 'PagePreview' ) ) {
-		var Core		= IRcomponents.Core,
-			Sandbox		= IRcomponents.Sandbox,
-			Modules		= IRcomponents.Modules;
+	if( Object.hasKeys( BF, 'Core Sandbox' ) && Object.hasKeys( BFapps, 'ExampleApplication' ) ) {
+		var	Core		= BF.Core,
+			Sandbox		= BF.Sandbox,
+			Modules		= BF.Modules;
 	
 		Core.registerSandbox( Sandbox );
 		
-		Core.registerModule( 'Exception', Modules.Exception );
-		Core.registerModule( 'ObjectIssueBox', Modules.ObjectIssueBox );
-		Core.registerModule( 'Filter', Modules.Filter );
-		Core.registerModule( 'Searchbutton', Modules.Searchbutton );
+		Core.registerModule( 'ExampleModule', Modules.ExampleModule );
 		
-		Core.startAll();
-		
-		//setTimeout(Core.stopAll, 6000);
+		Core.startAll();		
 	}
 	else {
-		throw new ReferenceError( 'PagePreview: unable to resolve necessary application object' ); 
+		throw new ReferenceError( 'ExampleApp: unable to resolve necessary application object' ); 
 	}
 	
 }( window ));

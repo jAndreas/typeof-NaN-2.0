@@ -13,7 +13,7 @@
 !(function _core_plugin_extensions_wrap() {
 	"use strict";
 	
-	Object.lookup( 'ir.components.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, PagePreview, undef ) {
+	Object.lookup( 'BarFoos.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, App, undef ) {
 		if( Object.type( Private.DOM ) === 'Object' ) {
 			Public.extend( Private.DOM, {
 				autocomplete:	function _autocomplete() {
