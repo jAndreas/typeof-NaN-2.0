@@ -13,13 +13,14 @@
 	var	BF = win.BarFoos = win.BarFoos || { },
 		BFapps = BF.apps = BF.apps || { };
 
-	if( Object.hasKeys( BF, 'Core Sandbox' ) && Object.hasKeys( BFapps, 'ExampleApplication' ) ) {
+	if( Object.hasKeys( BF, 'Core Sandbox' ) && Object.hasKeys( BFapps, 'ExampleApp' ) ) {
 		var	Core		= BF.Core,
 			Sandbox		= BF.Sandbox,
 			Modules		= BF.Modules;
 	
 		Core.registerSandbox( Sandbox );
 		
+		// Modules.ExampleModule is not defined! create it!
 		Core.registerModule( 'ExampleModule', Modules.ExampleModule );
 		
 		Core.startAll();		
