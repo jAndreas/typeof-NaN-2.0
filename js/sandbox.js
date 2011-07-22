@@ -39,7 +39,7 @@
 		
 		Private.access = [	'error',	// Core
 							'listen', 'dispatch', 'forget',	// plugin Communication
-							'request', 'getJSON',	// plugin Ajax
+							'ajax', 'getJSON',	// plugin Ajax
 							'Promise', 'when', // Core
 							'$', 'ready', 'contains', // plugin DOM manipulation
 							'data', 'removeData', 'hasData', // plugin Data
