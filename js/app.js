@@ -13,17 +13,29 @@
 	var	BF = win.BarFoos = win.BarFoos || { },
 		BFapps = BF.apps = BF.apps || { };
 
-	if( Object.hasKeys( BF, 'Core Sandbox' ) && Object.hasKeys( BFapps, 'ExampleApp' ) ) {
+	if( Object.hasKeys( BF, 'Core Sandbox' ) && Object.hasKeys( BFapps, 'ExampleApplication' ) ) {
 		var	Core		= BF.Core,
 			Sandbox		= BF.Sandbox,
 			Modules		= BF.Modules;
 	
+		// register Sandbox
 		Core.registerSandbox( Sandbox );
 		
-		// Modules.ExampleModule is not defined! create it!
+		// register Modules
 		Core.registerModule( 'ExampleModule', Modules.ExampleModule );
 		
-		Core.startAll();		
+		// startup all registered Modules
+		Core.startAll();
+
+		// register Modules which are not loaded immediately
+		Core.registerModule( 'Journal', Modules.Journal );
+		
+		// All pure application specific stuff on events 
+		Core.listen( [ 'SomeSpecialEvent' ], function _applicationEvents( event ) {
+			var eventData = event.data;
+			
+			Core.start( 'ExampleModule', eventData );
+		}, null);		
 	}
 	else {
 		throw new ReferenceError( 'ExampleApp: unable to resolve necessary application object' ); 

@@ -1,23 +1,24 @@
 /* 
  * core_plugin_dommanipulation.js
  * ------------------------------
- * Core plugin: DOM Manipulation (jQuery abstraction level)
+ * Core plugin: DOM Manipulation (jQuery/baseLib abstraction level)
  * 
  * This code runs in strict mode (if supported by the environment).
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-05-03
- * Changed: 2011-06-14
+ * Changed: 2011-07-18
  */
 
 !(function _core_plugin_dommanipulation_wrap() {
 	"use strict";
 	
 	Object.lookup( 'BarFoos.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, App, undef ) {
-		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.1 ******** *******/
+		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.2 ******** *******/
 		/****** ************************************************** *******/
 		var	push	= Array.prototype.push,
 			slice	= Array.prototype.slice,
+			splice	= Array.prototype.splice,
 			each	= Array.prototype.forEach,
 			some	= Array.prototype.some,
 			css		= $.fn.css;
@@ -28,8 +29,8 @@
 				push.apply( this, $( sel, args ).get() );
 			}
 
-			Init.prototype = Private.DOM;
-			Init.constructor = _$;
+			Init.prototype		= Private.DOM;
+			Init.constructor	= _$;
 
 			return new Init( selector );
 		};
@@ -66,6 +67,7 @@
 				return $.fn.dequeue.apply( this, arguments );
 			},
 			push: push,
+			splice: splice,
 			clone: function _clone() {
 				var newRef	= this.constructor(),
 					args	= arguments;
@@ -158,6 +160,10 @@
 			},
 			empty: function _empty() {
 				$.fn.empty.apply( this, arguments );
+				return this;
+			},
+			select: function _select() {
+				$.fn.select.apply( this, arguments );
 				return this;
 			},
 			is: function _is( check ) {
@@ -388,6 +394,16 @@
 			},
 			insertAfter: function _insertAfter() {
 				$.fn.insertAfter.apply( this, arguments );
+				
+				return this;
+			},
+			before: function _before() {
+				$.fn.before.apply( this, arguments );
+				
+				return this;
+			},
+			insertBefore: function _insertBefore() {
+				$.fn.insertBefore.apply( this, arguments );
 				
 				return this;
 			},
