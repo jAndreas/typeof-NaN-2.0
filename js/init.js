@@ -16,7 +16,7 @@
 		BFapps = BF.apps = BF.apps || { },
 		Core = BF.Core,
 
-	ExampleApp = (function _ExampleApp() {
+	TypeofNaN = (function _ExampleApp() {
 		var	Public				= { },
 			Private				= {
 				isJSON:	/^(?:\{.*\}|\[.*\])$/	// JSON validation regex
@@ -86,7 +86,7 @@
 	}());
 
 	if( Core ) {
-		Core.registerApplication( BFapps.ExampleApp = ExampleApp );
+		Core.registerApplication( BFapps.TypeofNaN = TypeofNaN );
 	}
 	else {
 		throw new TypeError( 'ExampleApp init: Core not available - aborting.' );

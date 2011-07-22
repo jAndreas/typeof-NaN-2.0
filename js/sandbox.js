@@ -16,7 +16,7 @@
 
 !(function _sandbox_wrap( win, doc, undef ) {
 	"use strict";
-	var BF = win.BarFoos = win.BarFoos || { };
+	var BF = win.BarFoos = win.BarFoos || { },
 	
 	Sandbox = function _Sandbox( Core ) {
 		var Public		= { },
