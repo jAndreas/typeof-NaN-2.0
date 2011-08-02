@@ -458,11 +458,17 @@
     <target name="-js.main.concat" depends="-load-build-info" description="(PRIVATE) Concatenates the JS files in dir.js">
         <echo message="Concatenating Main JS scripts..."/>
         <concat destfile="./${dir.publish}/${dir.js}/typeofnan-${build.number}.js">
-            <filelist dir="./${dir.publish}/${dir.js}/" files="toolkit.min.js, core.min.js, init.min.js"/>
+        	<fileset dir="./${dir.publish}/${dir.js}/baselib/plugins/">
+                <include name="**/*.min.js"/>
+            </fileset>
+            <filelist dir="./${dir.publish}/${dir.js}/" files="toolkit.min.js, core.min.js, sandbox.min.js, module.min.js, init.min.js"/>
             <fileset dir="./${dir.publish}/${dir.js}/plugins/">
                 <include name="**/*.min.js"/>
             </fileset>
-            <filelist dir="./${dir.publish}/${dir.js}/" files="sandbox.min.js, module.min.js, app.min.js"/>
+            <fileset dir="./${dir.publish}/${dir.js}/modules/">
+                <include name="**/*.min.js"/>
+            </fileset>
+            <filelist dir="./${dir.publish}/${dir.js}/" files="app.min.js"/>
         </concat>
     </target>
     
