@@ -9,7 +9,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-07-12
+ * Changed: 2011-08-03 - changed debug output syntax so it'll not get removed from ANT strip
  */
 
 !(function _core_wrap( win, doc, $, undef ) {
@@ -90,11 +90,17 @@
 		
 		Public.start = function _start( moduleID, args ) {
 			if( moduleID in moduleData ) {
-				var data = moduleData[ moduleID ];
+				var	data = moduleData[ moduleID ],
+					args = args || { };
+				
+				$.extend(args, {
+					moduleID: moduleID
+				});
+
 				try {
 					if( data.instances && data.instances.length ) {
 						if( data.multipleInstances ) {
-							data.instances.push( data.creator( Sandbox( this ), Application, args || { } ) );
+							data.instances.push( data.creator( Sandbox( this ), Application, args ) );
 							data.instances.slice( -1 )[ 0 ].init();
 						}
 						else {
@@ -102,7 +108,7 @@
 						}
 					}
 					else {
-						data.instances.push( data.creator( Sandbox( this ), Application, args || { } ) );
+						data.instances.push( data.creator( Sandbox( this ), Application, args ) );
 						data.instances[ 0 ].init();
 						data.multipleInstances = data.instances[ 0 ].multipleInstances;
 					}
