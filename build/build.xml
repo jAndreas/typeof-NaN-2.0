@@ -569,10 +569,10 @@
     
     
     <target name="-strip-console.log" description="(PRIVATE)Comments out any console.log statements">
-        <echo message="Commenting out console.log lines"/>
+        <echo message="Commenting out console.* lines"/>
 
 
-        <replaceregexp match="(console.log\(.*\))" replace="/\*\1\*/" flags="g" >
+        <replaceregexp match="(console\..*\(.*\))" replace="/\*\1\*/" flags="g" >
           <fileset dir="./${dir.publish}/${dir.js}/">
                 <include name="**/*.js"/>
                 <exclude name="**/*.min.js"/>
