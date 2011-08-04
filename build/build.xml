@@ -86,7 +86,7 @@
     </target>
 
 
-    <target name="buildkit">
+    <target name="dev">
     <if>
         <equals arg1="${env}" arg2="dev"/>
         <then>
@@ -106,7 +106,7 @@
 
         <else>
             <!-- Build a production environment -->
-            <echo message="Building a Production Environment..."/>
+            <echo message="Building a DEVELOPMENT Environment..."/>
             <antcall target="-buildkit.production"/>
         </else>
     </if>
@@ -270,7 +270,6 @@
                      -clean,
                      -prodcopy,
                      -usemin,
-                     -strip-console.log,
                      -js.all.minify,
                      -js.main.concat,
                      -js.mylibs.concat,
@@ -614,7 +613,7 @@
     <target name="-html" depends="-load-build-info" description="(PRIVATE) Very basic clean up of the HTML">
         <echo message="Update the HTML to reference our concatenated script file: scripts-${build.number}.min.js"/>
         <!-- scripts.js replacement handled as a replacetoken above -->
-        <replaceregexp match="&lt;!-- scripts concatenated [\d\w\s\W]*?!-- end ((scripts)|(concatenated and minified scripts))--&gt;" replace="&lt;script src='${dir.js}/typeofnan-${build.number}.min.js\'&gt;&lt;/script&gt;" flags="m">
+        <replaceregexp match="&lt;!-- scripts concatenated [\d\w\s\W]*?!-- end ((scripts)|(concatenated and minified scripts))--&gt;" replace="&lt;script src=\'${dir.js}/typeofnan-${build.number}.min.js\'&gt;&lt;/script&gt;" flags="m">
             <fileset dir="./${dir.publish}" includes="${page-files}"/>
         </replaceregexp>
         <!--[! use comments like this one to avoid having them get minified -->
