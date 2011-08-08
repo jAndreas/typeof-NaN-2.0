@@ -28,7 +28,9 @@
 		/****** Core Methods (called by the core only) *********** *******/
 		/****** ************************************************** *******/
 		Public.init = function _init() {
-			Public.deployAs( 'static', Private.deploymentData ).done( Private.cacheElements );
+			Public.deployAs( 'static', Private.deploymentData ).done(function _done( rootNode ) {
+				Private.cacheElements( rootNode ).bindDOMevents().initElements();
+			});
 			
 			Sandbox.listen( [ 'EXAMPLE_EVENT_1' ], Private.eventHandler, this );
 		};
@@ -54,19 +56,13 @@
 		
 		// cacheElements() extends secret.nodes with DOM element references
 		Private.cacheElements = function _cacheElements( rootNode ) {
-			Sandbox.extend( secret.nodes, (function _acquireNodes() {
-				//var EXAMPLE_NODE	= rootNode.find('#EXAMPLE_NODE'),
-				//	FOO_BAR			= rootNode.find('#FOO_BAR');
-					
+			Sandbox.extend( secret.nodes, (function _acquireNodes() {	
 				return {
 					rootNode:		rootNode
-					//EXAMPLE_NODE:	EXAMPLE_NODE,
-					//FOO_BAR:		FOO_BAR
 				};
 			}()));
 			
-			Private.bindDOMevents();
-			Private.initElements();
+			return Private;
 		};
 		
 		// bindDOMevents will take care of browser DOM level events
@@ -74,16 +70,20 @@
 			var nodes = secret.nodes;
 			
 			if( nodes ) {
-				nodes.rootNode.bind( 'mouseleave', function( event ) {
-					Sandbox.dispatch({ name: 'DISPATCH_EXAMPLE_EVENT', data: {
-						targetNode:		nodes.rootNode,
+				nodes.rootNode.bind( 'resize', function( event ) {
+					Sandbox.dispatch({ name: 'WINDOW_RESIZED', data: {
 						originalEvent:	event
 					}});
 				});
 			}
+			
+			return Private;
 		};
 		
 		Private.initElements = function _initElements() {
+			console.log('¯\_(ツ)_/¯');
+			
+			return Private;
 		};
 			
 		return Public;
