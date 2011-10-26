@@ -248,8 +248,7 @@
     <target name="-basics.production"
             depends="-rev,
                      -usemin,
-					 -strip-console.all,
-                     -js.all.minify,
+		     -strip-console.all,
                      -js.main.concat,
                      -js.mylibs.concat,
                      -js.scripts.concat,
@@ -345,7 +344,8 @@
     <target name="-build.production"
             depends="-rev,
                      -usemin,
-                     -js.all.minify,
+		     -strip-console.all,
+		     -js.all.minify,
                      -js.main.concat,
                      -js.mylibs.concat,
                      -js.scripts.concat,
@@ -488,7 +488,7 @@
 		<echo message="Concatenating Main JS scripts..."/>
 		<!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
 		<concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.js">
-				<fileset dir="./${dir.intermediate}/${dir.js}/baselib/plugins/">
+			<fileset dir="./${dir.intermediate}/${dir.js}/baselib/plugins/">
 				<include name="**/*.js"/>
 			</fileset>
 			<filelist dir="./${dir.intermediate}/${dir.js}/" files="toolkit.js, core.js, sandbox.js, module.js, init.js"/>

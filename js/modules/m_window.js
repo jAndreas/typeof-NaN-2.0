@@ -21,7 +21,9 @@
 		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
 			Private	= { 
 				deploymentData: {
-					rootNode: 'window'
+					rootNode: function _rootNode() {
+						return Sandbox.$( window );
+					}
 				}
 			};
 
