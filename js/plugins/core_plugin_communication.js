@@ -13,7 +13,7 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-06-18
- * Changed: 2011-08-09 - Added .listenOnce() and shortcut .once()
+ * Changed: 2011-08-30 - Added a .stopPropagation property to the event object which may get used to stop further handlers from firing.
  */
 
 !(function _core_plugin_communication_wrap() {
@@ -25,9 +25,12 @@
 		Public.dispatch = function _dispatch( messageInfo ) {
 			if( Object.type( messageInfo ) === 'Object' ) {
 				if( typeof messageInfo.name === 'string' ) {
+			//console.groupCollapsed('MEDIATOR: Dispatching event ', messageInfo.name);
 					if( messageInfo.name in Private.messagePool ) {
-						Private.messagePool[ messageInfo.name ].forEach(function _forEach( listener ) {
+						Private.messagePool[ messageInfo.name ].some(function _some( listener ) {
 							try {
+							//console.info( 'eventData for listener #' + idx );
+							//console.dir( messageInfo );
 								listener.callback.apply( listener.scope, [ messageInfo ] );
 							} catch( ex ) {
 								Public.error({
@@ -37,8 +40,15 @@
 									msg:	'unable to dispatch event "' + messageInfo.name + '". Original error: "' + ex.message + '"'
 								});
 							}
-						});	
+						
+							return messageInfo.stopPropagation;
+						});
 					}
+					
+					if( typeof messageInfo.callback === 'function' ) {
+						messageInfo.callback( messageInfo.response );
+					}
+			//console.groupEnd();
 				}
 				else {
 					Public.error({
@@ -65,7 +75,7 @@
 			if( Object.type( eventName ) !== 'Array' ) {
 				eventName = [ eventName ];
 			}
-			
+		//console.info('MEDIATOR: Listening for ', eventName, 'method: ', callback);	
 			eventName.forEach(function _forEach( event ) {
 				if( typeof event === 'string' ) {
 					if( typeof Private.messagePool[ event ] === 'undefined' ) {
@@ -92,7 +102,7 @@
 			if( Object.type( eventName ) !== 'Array' ) {
 				eventName = [ eventName ];
 			}
-			
+		//console.info('MEDIATOR: Forgetting for ', eventName, 'method: ', callback);
 			eventName.forEach(function( event ) {
 				if( typeof event === 'string' ) {
 					if( Private.messagePool[ event ] && Object.type( Private.messagePool[ event ] ) === 'Array' ) {
@@ -121,8 +131,8 @@
 		
 		Public.listenOnce = Public.once = function _listenOnce( eventName, callback, scope ) {
 			function fireAndForget() {
-				callback.apply( this, arguments );
 				Public.forget( eventName, fireAndForget );
+				callback.apply( this, arguments );
 			}
 			
 			Public.listen( eventName, fireAndForget, scope );

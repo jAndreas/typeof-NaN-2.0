@@ -11,7 +11,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-06-17
+ * Changed: 2011-08-08 - added .lsRemove()
  */
 
 !(function _sandbox_wrap( win, doc, undef ) {
@@ -38,12 +38,12 @@
 		}
 		
 		Private.access = [	'error',	// Core
-							'listen', 'dispatch', 'forget',	// plugin Communication
-							'ajax', 'getJSON',	// plugin Ajax
+							'listen', 'listenOnce', 'once', 'dispatch', 'forget',	// plugin Communication
+							'request', 'getJSON',	// plugin Ajax
 							'Promise', 'when', // Core
 							'$', 'ready', 'contains', // plugin DOM manipulation
-							'data', 'removeData', 'hasData', // plugin Data
-							'extend' // Core
+							'data', 'removeData', 'hasData', 'lsRead', 'lsWrite', 'lsRemove', 'lsStore', 'lsClear', // plugin Data
+							'extend', 'trim' // Core
 		];
 
 		if( Object.type( Core ) === 'Object' ) {

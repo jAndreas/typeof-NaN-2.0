@@ -7,14 +7,14 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-05-03
- * Changed: 2011-08-10 - added .parent(), backlink object reference added to .clone(), .parent(), .next(), .prev(), .closest()
+ * Changed: 2011-10-22 - added .replaceWith()
  */
 
 !(function _core_plugin_dommanipulation_wrap() {
 	"use strict";
 	
 	Object.lookup( 'BarFoos.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, App, undef ) {
-		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.2 ******** *******/
+		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.6.4 ******** *******/
 		/****** ************************************************** *******/
 		var	push	= Array.prototype.push,
 			slice	= Array.prototype.slice,
@@ -63,16 +63,31 @@
 			domManip: function _domManip() {
 				return $.fn.domManip.apply( this, arguments );
 			},
+			triggerHandler: function _triggerHandler() {
+				return $.fn.triggerHandler.apply( this, arguments );
+			},
+			eq: function _eq() {
+				return $.fn.eq.apply( this, arguments );
+			},
 			dequeue: function _dequeue() {
 				return $.fn.dequeue.apply( this, arguments );
 			},
 			push: push,
 			splice: splice,
+			add: function _add() {
+				var newRef	= this.constructor(),
+					args	= arguments;
+					
+				newRef.prevRef = this;
+				push.apply( newRef, $.fn.add.apply( this, args ).get() );
+
+				return newRef;
+			},
 			clone: function _clone() {
 				var newRef	= this.constructor(),
 					args	= arguments;
-				
-				newRef.prevRef = this;	
+					
+				newRef.prevRef = this;
 				push.apply( newRef, $.fn.clone.apply( this, args ).get() );
 
 				return newRef;
@@ -82,7 +97,7 @@
 					args	= arguments;
 				
 				newRef.prevRef = this;
-				push.apply( newRef, $.fn.find.apply( this, arguments ).get() );
+				push.apply( newRef, $.fn.find.apply( this, args ).get() );
 				
 				return newRef;
 			},
@@ -94,7 +109,7 @@
 					args	= arguments;
 				
 				newRef.prevRef = this;
-				push.apply( newRef, $.fn.prev.apply( this, arguments ).get() );
+				push.apply( newRef, $.fn.prev.apply( this, args ).get() );
 				
 				return newRef;
 			},
@@ -103,7 +118,7 @@
 					args	= arguments;
 				
 				newRef.prevRef = this;
-				push.apply( newRef, $.fn.next.apply( this, arguments ).get() );
+				push.apply( newRef, $.fn.next.apply( this, args ).get() );
 				
 				return newRef;
 			},
@@ -112,16 +127,52 @@
 					args	= arguments;
 					
 				newRef.prevRef = this;
-				push.apply( newRef, $.fn.closest.apply( this, arguments ).get() );
+				push.apply( newRef, $.fn.closest.apply( this, args ).get() );
 				
 				return newRef;
 			},
 			parent: function _parent() {
 				var newRef	= this.constructor(),
 					args	= arguments;
+				
+				newRef.prevRef = this;
+				push.apply( newRef, $.fn.parent.apply( this, args ).get() );
+				
+				return newRef;
+			},
+			last: function _last() {
+				var newRef	= this.constructor(),
+					args	= arguments;
+				
+				newRef.prevRef = this;
+				push.apply( newRef, $.fn.last.apply( this, args ).get() );
+				
+				return newRef;
+			},
+			wrap: function _wrap() {
+				var newRef	= this.constructor(),
+					args	= arguments;
 					
 				newRef.prevRef = this;
-				push.apply( newRef, $.fn.parent.apply( this, arguments ).get() );
+				push.apply( newRef, $.fn.wrap.apply( this, args ).get() );
+				
+				return newRef;
+			},
+			wrapAll: function _wrapAll() {
+				var newRef	= this.constructor(),
+					args	= arguments;
+					
+				newRef.prevRef = this;
+				push.apply( newRef, $.fn.wrapAll.apply( this, args ).get() );
+				
+				return newRef;
+			},
+			replaceWith: function _replaceWith() {
+				var newRef	= this.constructor(),
+					args	= arguments;
+					
+				newRef.prevRef = this;
+				push.apply( newRef, $.fn.replaceWith.apply( this, args ).get() );
 				
 				return newRef;
 			},
@@ -138,7 +189,7 @@
 			trigger: function _trigger() {
 				$.fn.trigger.apply( this, arguments );
 			},
-			unbind: function _unbind( node, ev, handler ) {
+			unbind: function _unbind( ev, handler ) {
 				$.fn.unbind.call( this, ev, handler );
 				return this;
 			},
@@ -151,21 +202,21 @@
 			val: function _val() {
 				var result = $.fn.val.apply( this, arguments );
 				
-				return arguments.length > 1 ? this : result;
+				return arguments.length ? this : result;
 			},
 			text: function _text() {
 				var result = $.fn.text.apply( this, arguments );
 				
-				return arguments.length > 1 ? this : result;
+				return arguments.length ? this : result;
 			},
 			html: function _html() {
 				var result = $.fn.html.apply( this, arguments );
 				
-				return arguments.length > 1 ? this : result;
+				return arguments.length ? this : result;
 			},
 			attr: function _attr() {
-				$.fn.attr.apply( this, arguments );
-				return this;
+				var result = $.fn.attr.apply( this, arguments );
+				return arguments.length > 1 ? this : result;
 			},
 			removeAttr: function _removeAttr() {
 				$.fn.removeAttr.apply( this, arguments );
@@ -199,7 +250,7 @@
 				return this;
 			},
 			css: function _css( prop, value ) {
-				if( value === "" || value || Object.type( prop ) === 'Object' ) {
+				if( value === 0 || value === "" || value || Object.type( prop ) === 'Object' ) {
 					if( value ) {
 						$.fn.css.call( slice.call( this, 0 ), App.createCSS( prop ), value );
 					}
@@ -261,12 +312,13 @@
 									// invoke a new function(-context) to avoid that all timeout callbacks would closure the same variable
 									// store the timeout id in the 'animationTimer' array which is a data property
 									(function _freeClosure( myElem ) {
-										Public.data( myElem, 'animationTimer').push(setTimeout(function _animationDelay() {
+										Public.data( myElem, 'animationTimer').push(win.setTimeout(function _animationDelay() {
 											// TODO: initialize an interval which checks if there still are css prop deltas to be more accurate. 
 											css.call( [ myElem ], transition, '' );
 											
 											Public.removeData( myElem, 'animated' );
-											
+											delete myElem.aniprops;
+										
 											// if elements animQueue is available and not empty, execute outstanding animations first
 											if( Object.type( Public.data( myElem, 'animQueue') ) === 'Array' && Public.data( myElem, 'animQueue' ).length ) {
 												_animate.apply( that, Public.data( myElem, 'animQueue').shift() );
@@ -279,7 +331,7 @@
 													myElem.stopAnimation = null;
 												}
 											}
-										}, duration + 50));
+										}, duration + 15));
 									}( elem ));
 								}
 								
@@ -316,12 +368,21 @@
 						
 						that.each(function( index, elem ) {
 							elem.stopAnimation = true;
-							$.fn.css.call( [ elem ], transition, '' );
+							
+							css.call( [ elem ], transition, '0ms all linear' );
+							
+							if( elem.aniprops ) {
+								for( var prop in elem.aniprops ) {
+									if( prop && elem.aniprops.hasOwnProperty( prop ) ) {
+										css.call( [ elem ], prop, css.call( [elem], prop ) );
+									}
+								}
+							}
 							
 							// TODO: this section should probably goe into 'jumpToEnd'
 							if( Object.type( Public.data( elem, 'animationTimer' ) ) === 'Array' ) {
 								Public.data( elem, 'animationTimer' ).forEach(function _forEach( timerID ) {
-									clearInterval( timerID );
+									win.clearInterval( timerID );
 								});
 							}
 							
@@ -334,13 +395,15 @@
 							Public.removeData( elem, 'animated' );
 							
 							if( jumpToEnd ) {
-								setTimeout(function() {
+								win.setTimeout(function() {
 									if( elem.aniprops ) {
 										for( var prop in elem.aniprops ) {
-											$.fn.css.call( [ elem ], prop, elem.aniprops[prop] );
+											if( prop && elem.aniprops.hasOwnProperty( prop ) ) {
+												css.call( [ elem ], prop, elem.aniprops[ prop ] );
+											}
 										}
 									}
-								}, 1);
+								}, 15);
 							}
 						});
 						
@@ -348,7 +411,7 @@
 					};
 				}
 				else {
-					return function _stop() {
+					return function _jQstopFallback() {
 						var that = this;
 						
 						$.fn.stop.apply( that, arguments );
@@ -399,6 +462,8 @@
 			},
 			prependTo: function _prependTo() {
 				$.fn.prependTo.apply( this, arguments );
+				
+				return this;
 			},
 			after: function _after() {
 				$.fn.after.apply( this, arguments );
@@ -444,6 +509,10 @@
 			scrollLeft: function _scrollLeft() {
 				return $.fn.scrollLeft.apply( this, arguments );
 			},
+			data: function _data() {
+				var result = $.fn.data.apply( this, arguments );
+				return arguments.length > 1 ? this : result;
+			},
 			delay: function _delay( duration, method /* , arguments */ ) {
 				var that	= this,
 					args	= slice.apply( arguments, [2] );
@@ -451,8 +520,8 @@
 				if( typeof method === 'string' ) {
 					method = that[ method ];
 				}
-				
-				setTimeout(function() {
+			
+				win.setTimeout(function _delayedFunction() {
 					method.apply( that, args );
 				}, duration);
 				

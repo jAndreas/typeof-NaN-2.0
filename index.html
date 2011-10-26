@@ -85,18 +85,13 @@
     <footer>
     </footer>
   </div> 
-
-  <!--[if lt IE 7 ]>
-    <script src="js/libs/dd_belatedpng.js"></script>
-    <script>DD_belatedPNG.fix('img, .png_bg'); // Fix any <img> or .png_bg bg-images. Also, please read goo.gl/mZiyb </script>
-  <![endif]-->
   
-  <!-- Grab Google CDN's jQuery, with a protocol relative URL; fall back to local if necessary -->
+  
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
   <script>("jQuery" in window)||document.write("<script src='js/baselib/jquery-1.6.2.min.js'>\x3C/script>");</script>
   
   <!-- scripts concatenated and minified via ant build script-->
-  <script src="js/script.js"></script>
+  <script defer src="js/script.js"></script>
   <!-- end scripts-->
 
   <script type="text/javascript">
@@ -105,6 +100,11 @@
     g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
     s.parentNode.insertBefore(g,s)}(document,'script'));
   </script>
+  
+  <!--[if lt IE 7 ]>
+    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
 
 </body>
 </html>

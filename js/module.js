@@ -8,7 +8,7 @@
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-23
- * Changed: 2011-07-18 - moved highlight() into application layer
+ * Changed: 2011-10-22 - static/dynamic module creation linked with promise objects
  */
 
 !(function _module_wrap( win, doc, undef ) {
@@ -39,21 +39,22 @@
 				
 				return result;
 			},
-			clearNodeBindings:	function _clearNodeBindings() {
+			clearNodeBindings:	function _clearNodeBindings( disableOnly ) {
 				var	thisRef = this,
 					nodes	= thisRef.nodes;
-				console.info('clearNodeBindings()');
+			
 				Object.keys( nodes ).forEach(function _forEachNode( node ) {
 					nodes[ node ].unbind().undelegate();
 					
-					if( Public.removeFromDOM ) {
+					if( Public.removeFromDOM && !disableOnly ) {
 						nodes[ node ].remove();
+						nodes[ node ] = null;
 					}
-					
-					nodes[ node ] = null;
 				});
 				
-				nodes = { };
+				if( !disableOnly ) {
+					nodes = { }; secret = { };
+				}
 			}
 		});
 
@@ -100,7 +101,7 @@
 		
 		// moduleErrorHandler() is somekind of an "empty vessel" function. It trys to create something useful out of the parameters it gets passed in.
 		Public.moduleErrorHandler = function _moduleErrorHandler( ) {
-			var err		= 'Module error:\n',
+			var err		= 'Module error (' + secret.moduleID + '):\n',
 				args	= Array.prototype.slice.call( arguments );
 			
 			if( args.length ) {
@@ -123,23 +124,41 @@
 					msg:	err	
 				}});
 			}
+			
+			return Public;
 		};
 		
 		/* -------------------------------------------------------------- */
 
 		// static module setup. On DOMContentLoaded retrieve the modules base node and return the reference. Invokes a promise maker to keeps things asyncronously.
 		Private.setupStatic = function _setupStatic( data ) {
-			console.log('setupStatic()');
+			var rootNode;
 			
 			return Sandbox.Promise(function _setupStaticPromise( promise ) {
 				Sandbox.ready(function _ready() {
 					if( data.rootNode ) {
 						switch( Object.type( data.rootNode ) ) {
 							case 'Function':
-								promise.resolve( data.rootNode() );
+								rootNode = data.rootNode();
+								
+								if( rootNode && rootNode.length ) {
+									promise.resolve( rootNode );
+								}
+								else {
+									promise.reject( 'BarFoos: unable to resolve root node. Modules GUI interface will not be available' );
+								}
+								
 								break;
 							case 'String':
-								promise.resolve( $$( data.rootNode ) );
+								rootNode = $$( data.rootNode );
+							
+								if( rootNode && rootNode.length ) {
+									promise.resolve( rootNode );
+								}
+								else {
+									promise.reject( 'BarFoos: unable to resolve root node. Modules GUI interface will not be available' );
+								}
+								
 								break;
 							default:
 								promise.reject();
@@ -164,25 +183,29 @@
 			}).promise();
 		};
 		
-		// TODO
 		Private.setupDynamic = function _setupDynamic( data ) {
-			var $$target = null;
-			console.log('setupDynamic()');
+			var $$target		= null,
+				connectMethod	= 'appendTo';
 			
 			return Sandbox.Promise(function _setupDynamicPromise( promise ) {
 				if( Object.type( data ) === 'Object' ) {
 					if( $$target = data.targetContainer ) {
+						// if we got passed in a selector-string or a DOMNode ref, create a BarFoos Object
 						if( /Node|String/.test( Object.type( data.targetContainer ) ) ) {
 							$$target = $$( data.targetContainer );
 						}
 						
-						if( $$target && $$target.length ) {
+						if( Object.type( data.connectMethod ) === 'String' && typeof $$target[ data.connectMethod ] === 'function' ) {
+							connectMethod = data.connectMethod
+						}
+						
+						if( $$target && $$target.length && Object.type( $$target[ 0 ] ) === 'Node' ) {
 							Public.removeFromDOM = true;
 							
 							Object.keys( data ).forEach(function _forEach( type ) {
 								switch( type ) {
 									case 'htmlString':
-										promise.resolve( $$( data[ type ] ).appendTo( $$target ) );
+										promise.resolve( $$( data[ type ] )[ connectMethod ]( $$target ) );
 										break;
 									case 'ajax':
 										break;
@@ -190,6 +213,9 @@
 										break;
 								}
 							});
+						}
+						else {
+							promise.reject( 'BarFoos: unable to resolve root node. Modules GUI interface will not be available' );
 						}
 					}
 					else {
@@ -216,7 +242,7 @@
 		
 		// TODO
 		Private.setupWorker = function _setupWorker() {
-			console.log('setupWorker()');
+			//console.log('setupWorker()');
 		};
 			
 		return Public;

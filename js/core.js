@@ -90,27 +90,41 @@
 		
 		Public.start = function _start( moduleID, args ) {
 			if( moduleID in moduleData ) {
-				var	data = moduleData[ moduleID ],
-					args = args || { };
-				
-				$.extend(args, {
-					moduleID: moduleID
+				var data		= moduleData[ moduleID ],
+					args		= args || { },
+					instances	= data.instances,
+					initResult	= null;
+					
+				$.extend( args, {
+					moduleID:		moduleID,
+					moduleIndex:	instances.length,
+					moduleKey:		++Private.globalModuleKey
 				});
-
+				
 				try {
-					if( data.instances && data.instances.length ) {
+					if( instances && instances.length ) {
 						if( data.multipleInstances ) {
-							data.instances.push( data.creator( Sandbox( this ), Application, args ) );
-							data.instances.slice( -1 )[ 0 ].init();
+							instances.push( data.creator( Sandbox( this ), Application, args ) );
+							instances.slice( -1 )[ 0 ].moduleKey = Private.globalModuleKey;
+							initResult = instances.slice( -1 )[ 0 ].init();
+							
+							if( initResult === -1 ) {
+								Public.stop( moduleID, instances.slice( -1 )[ 0 ].moduleKey );
+							}
 						}
 						else {
 							throw new Error( 'Module "' + moduleID + '" does not allow multiple instances' );
 						}
 					}
 					else {
-						data.instances.push( data.creator( Sandbox( this ), Application, args ) );
-						data.instances[ 0 ].init();
-						data.multipleInstances = data.instances[ 0 ].multipleInstances;
+						instances.push( data.creator( Sandbox( this ), Application, args ) );
+						instances[ 0 ].moduleKey = Private.globalModuleKey;
+						initResult = instances[ 0 ].init();
+						data.multipleInstances = instances[ 0 ].multipleInstances;
+						
+						if( initResult === -1 ) {
+							Public.stop( moduleID, instances[ 0 ].moduleKey );
+						}
 					}
 				} catch( ex ) {
 					Public.error({
@@ -125,13 +139,15 @@
 			return Public;
 		};
 		
-		Public.stop = function _stop( moduleID, index ) {
+		Public.stop = function _stop( moduleID, key ) {
 			if( moduleID in moduleData ) {
-				var data = moduleData[ moduleID ];
+				var data	= moduleData[ moduleID ],
+					mIndex	= -1;
+					
 				try {
 					if( data.instances && data.instances.length ) {
-						if( !index ) {
-							data.instances.forEach(function( inst ) {
+						if( key === undef ) {
+							data.instances.forEach(function _forEach( inst ) {
 								inst.destroy();
 								inst = null;	
 							});
@@ -139,10 +155,17 @@
 							data.instances = [ ];
 						}
 						else {
-							var inst = data.instances.splice( index, 1 )[ 0 ];
-							if( inst ) {
-								inst.destroy();
-								inst = null;
+							data.instances.some(function _some( inst, index ) {
+								if( inst.moduleKey === key ) {
+									mIndex = index;
+									inst.destroy();
+									inst = null;
+									return true;
+								}
+							});
+							
+							if( mIndex > -1 ) {
+								data.instances.splice( mIndex, 1 );
 							}
 						}
 					}
@@ -205,6 +228,10 @@
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^BLOCK END^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		
+		Public.trim = function _trim() {
+			return $.trim.apply( null, arguments );
+		};
+		
 		Public.Promise = function _Promise() {
 			return $.Deferred.apply( null, arguments );
 		};
@@ -225,6 +252,8 @@
 			return Public;
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^BLOCK END^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
+		
+		Private.globalModuleKey = 0;
 		
 		Private.formatStacktrace = function( strace ) {
 			if( Object.type( strace ) === 'String' ) {
