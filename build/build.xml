@@ -491,7 +491,7 @@
 				<fileset dir="./${dir.intermediate}/${dir.js}/baselib/plugins/">
 				<include name="**/*.js"/>
 			</fileset>
-			<filelist dir="./${dir.intermediate}/${dir.js}/" files="toolkit.js, core.js, sandbox.js, module.js"/>
+			<filelist dir="./${dir.intermediate}/${dir.js}/" files="toolkit.js, core.js, sandbox.js, module.js, init.js"/>
 			<fileset dir="./${dir.intermediate}/${dir.js}/plugins/">
 				<include name="**/*.js"/>
 			</fileset>

@@ -16,14 +16,14 @@
 		BFapps = BF.apps = BF.apps || { },
 		Core = BF.Core,
 
-	TypeofNaN = (function _ExampleApp() {
+	TypeofNaN = (function _TypeofNaN() {
 		var	Public				= { },
 			Private				= {
 				isJSON:	/^(?:\{.*\}|\[.*\])$/	// JSON validation regex
 			};
 
-		Public.name			= 'An example application init script';
-		Public.version			= 0.01;
+		Public.name			= 'TypeofNaN 2.0 Website';
+		Public.version			= 0.1;
 	
 		// copy and shortcut some native methods
 		Public.toStr			= Object.prototype.toString;
@@ -89,6 +89,6 @@
 		Core.registerApplication( BFapps.TypeofNaN = TypeofNaN );
 	}
 	else {
-		throw new TypeError( 'ExampleApp init: Core not available - aborting.' );
+		throw new TypeError(  TypeofNaN.name + ' init: Core not available - aborting.' );
 	}
 }( window, window.document ));
