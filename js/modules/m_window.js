@@ -28,11 +28,13 @@
 		/****** Core Methods (called by the core only) *********** *******/
 		/****** ************************************************** *******/
 		Public.init = function _init() {
-			Public.deployAs( 'static', Private.deploymentData ).done(function _done( rootNode ) {
-				Private.cacheElements( rootNode ).bindDOMevents().initElements();
-			});
-			
 			Sandbox.listen( [ 'EXAMPLE_EVENT_1' ], Private.eventHandler, this );
+			
+			Public.deployAs( 'static', Private.deploymentData ).then( function _done( rootNode ) {
+				Private.cacheElements( rootNode ).bindDOMevents().initElements();
+			}, function _fail( err ) {
+				Public.moduleErrorHandler( err ).destroy();
+			});
 		};
 		
 		Public.destroy = function _destroy() {
@@ -81,6 +83,7 @@
 		};
 		
 		Private.initElements = function _initElements() {
+			alert('window module init');
 			console.log('¯\_(ツ)_/¯');
 			
 			return Private;
