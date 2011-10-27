@@ -7,7 +7,7 @@
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-05-03
- * Changed: 2011-10-22 - added .replaceWith()
+ * Changed: 2011-10-25 - fixed a bug in .animate(). Element.aniprops gets now deleted after animation.
  */
 
 !(function _core_plugin_dommanipulation_wrap() {
@@ -285,7 +285,7 @@
 							if( Object.type( callback ) === 'String' ) {
 								easing = callback;
 							}
-							
+						
 							// apply animation on each element in our wrapped set
 							each.call( that, function _eaching( elem ) {
 								// if the element is currently animated by us, push the arguments into it's "animQueue" array for later execution
@@ -516,7 +516,7 @@
 			delay: function _delay( duration, method /* , arguments */ ) {
 				var that	= this,
 					args	= slice.apply( arguments, [2] );
-					
+			
 				if( typeof method === 'string' ) {
 					method = that[ method ];
 				}
