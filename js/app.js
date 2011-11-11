@@ -1,11 +1,13 @@
 /* 
  * app.js ( Example )
  * ------------------------------
- * Example Application - Wire things up
+ * typeofNaN 2.0 - Wire things up
+ *
+ * * This code runs in strict mode (if supported by the environment)
  * ------------------------------
  * Author: Andreas Goebel
- * Date: 2011-06-18
- * Changed: 2011-06-18
+ * Date: 2011-11-10
+ * Changed: 2011-11-11
  */
  
 !(function _application_wrap( win ) {
@@ -27,7 +29,7 @@
 		// startup all registered Modules
 		Core.startAll();
 
-		// register Modules which are not loaded immediately
+		// register Modules which are not loaded immediately / deferred
 		//Core.registerModule( 'Journal', Modules.Journal );
 		
 		// All pure application specific stuff on events 
@@ -38,7 +40,7 @@
 		//}, null);		
 	}
 	else {
-		throw new ReferenceError( 'ExampleApp: unable to resolve necessary application object' ); 
+		throw new ReferenceError( 'typeofNaN2.0: unable to resolve necessary application object' ); 
 	}
 	
 }( window ));
