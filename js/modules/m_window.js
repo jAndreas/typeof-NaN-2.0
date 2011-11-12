@@ -12,14 +12,13 @@
 
 !(function _module_window_wrap( win, doc, undef ) {
 	"use strict";
-	var IR = win.ir = win.ir || { },
-		IRcomponents = IR.components = IR.components || { },
-		Modules = IRcomponents.Modules = IRcomponents.Modules || { },
+	var BF		= win.BarFoos = win.BarFoos || { },
+		Modules	= BF.Modules = BF.Modules || { },
 	
 	Window = function _Window( Sandbox, App, secret ) {
 		secret	= secret || { };
 		
-		var	Public	= IRcomponents.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
+		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
 			Private	= { 
 				deploymentData: { 
 					rootNode: function _rootNode() {
@@ -109,6 +108,7 @@
 			return Private;
 		};
 		
+		// initElements should initialize any module related task. Furthermore it is a common module entry point
 		Private.initElements = function _initElements() {
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
@@ -135,15 +135,17 @@
 			// initialize data for the first time
 			Private.updateDimensions( rootNode ).updateOffsets( rootNode );
 			
+			alert('Apache ANT - you hate and love it at the same time!');
+			
 			return Private;
 		};
 		
 		// update window dimensions
 		Private.updateDimensions = function _updateDimensions( node ) {
-			Private.currentDimensions = Sandbox.extend({
-					width:	node.width(),
-					height:	node.height()
-			}, node.position());
+			Private.currentDimensions = {
+				width:	node.width(),
+				height:	node.height()
+			};
 			
 			return Private;
 		};

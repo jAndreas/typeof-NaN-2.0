@@ -205,6 +205,10 @@ td { vertical-align: top; }
 /* ==|== primary styles =====================================================
    Author: Andreas Göbel
    ========================================================================== */
+   
+body {
+	background: url(/img/bg.jpg) repeat scroll 0 0 transparent;
+}
  
 div#container{
 	text-align: center;

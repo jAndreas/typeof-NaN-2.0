@@ -137,6 +137,11 @@
         </else>
     </if>
     </target>
+    
+    <target name="debug">
+    	<echo message="Building a Debug Environment..."/>
+    	<antcall target="-build.debug" />
+    </target>
 
 
     <target name="minify">
@@ -248,7 +253,6 @@
     <target name="-basics.production"
             depends="-rev,
                      -usemin,
-		     -strip-console.all,
                      -js.main.concat,
                      -js.mylibs.concat,
                      -js.scripts.concat,
@@ -344,11 +348,22 @@
     <target name="-build.production"
             depends="-rev,
                      -usemin,
-		     -strip-console.all,
-		     -js.all.minify,
+				     -js.all.minify,
                      -js.main.concat,
                      -js.mylibs.concat,
                      -js.scripts.concat,
+                     -css,
+                     -manifest,
+                     -htmlclean,
+                     -imagespng,
+                     -imagesjpg,
+                     -copy"/>
+                     
+    <target name="-build.debug"
+            depends="-rev,
+                     -js.debug.concat,
+                     -js.mylibs.debug.concat,
+                     -js.scripts.debug.concat,
                      -css,
                      -manifest,
                      -htmlclean,
@@ -472,33 +487,33 @@
         <echo message="A copy of all non-dev files are now in: ./${dir.publish}."/>
     </target>
     
-    <!-- JAVASCRIPT -->
-	<target name="-strip-console.all" description="(PRIVATE)Comments out any console.xxx statements">
-        <echo message="Commenting out console.* lines"/>
-
-        <replaceregexp match="(console\..*\(.*\))" replace="/\*\1\*/" flags="g" >
-          <fileset dir="./${dir.intermediate}/${dir.js}/">
-                <include name="**/*.js"/>
-                <exclude name="**/*.min.js"/>
-            </fileset>
-        </replaceregexp>
-    </target>
-	
+    <!-- JAVASCRIPT -->	
     <target name="-js.main.concat" depends="-js.all.minify" description="(PRIVATE) Concatenates the JS files in dir.">
 		<echo message="Concatenating Main JS scripts..."/>
 		<!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
 		<concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.js">
-			<fileset dir="./${dir.intermediate}/${dir.js}/baselib/plugins/">
-				<include name="**/*.js"/>
-			</fileset>
-			<filelist dir="./${dir.intermediate}/${dir.js}/" files="toolkit.js, core.js, sandbox.js, module.js, init.js"/>
-			<fileset dir="./${dir.intermediate}/${dir.js}/plugins/">
-				<include name="**/*.js"/>
-			</fileset>
+			<filelist dir="./${dir.intermediate}/${dir.js}/" files="barfoos.js"/>
 			<fileset dir="./${dir.intermediate}/${dir.js}/modules/">
 				<include name="**/*.js"/>
 			</fileset>
-			<filelist dir="./${dir.intermediate}/${dir.js}/" files="app.js"/>
+			<filelist dir="./${dir.intermediate}/${dir.js}/" files="init.js, app.js"/>
+		</concat>
+	</target>
+	
+	<target name="-js.debug.concat" description="(PRIVATE) Concatenates the JS files in dir.">
+		<echo message="Concatenating Debug JS scripts..."/>
+		<echo message="Copying scripts"/>
+        <copy todir="${dir.intermediate}/">
+            <fileset dir="${dir.source}/" includes="${dir.js}/**/*.js"  />
+        </copy>
+        
+		<!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
+		<concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.js">
+			<filelist dir="./${dir.intermediate}/${dir.js}/" files="barfoos-debug.js"/>
+			<fileset dir="./${dir.intermediate}/${dir.js}/modules/">
+				<include name="**/*.js"/>
+			</fileset>
+			<filelist dir="./${dir.intermediate}/${dir.js}/" files="init.js, app.js"/>
 		</concat>
 	</target>
     
@@ -515,8 +530,44 @@
         </concat>
     </target>
     
+    <target name="-js.mylibs.debug.concat" description="(PRIVATE) Concatenates the JS files in dir.js.mylibs">
+        <mkdir dir="./${dir.intermediate}/${dir.js.mylibs}"/>
+
+        <echo message="Concatenating JS libraries"/>
+        <!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
+        <concat destfile="./${dir.intermediate}/${dir.js}/mylibs-concat.js">
+            <fileset dir="./${dir.intermediate}/${dir.js.mylibs}/"
+                includes="**/*.js" 
+                excludes="${file.js.bypass}"/>                
+                  
+        </concat>
+    </target>
+    
     
     <target name="-js.scripts.concat" depends="-js.main.concat,-js.mylibs.concat" if="build.concat.scripts">
+        <echo message="Concatenating library file with main script file"/>
+        <!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
+        <concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.min.js">
+            <fileset dir="./${dir.intermediate}/${dir.js}/">
+                <include name="mylibs-concat.js"/>
+                <include name="scripts-concat.js"/>
+            </fileset>      
+        </concat>
+
+        <checksum file="${dir.intermediate}/${dir.js}/scripts-concat.min.js" algorithm="sha" property="scripts.sha" />
+        <if>
+            <isset property="gae.js_dir" />
+            <then>
+                <property name="scripts.js" value="${gae.js_dir}/${scripts.sha}.js" />
+            </then>
+            <else>
+                <property name="scripts.js" value="${dir.js}/${scripts.sha}.js" />
+            </else>
+        </if>
+        <copy file="${dir.intermediate}/${dir.js}/scripts-concat.min.js" tofile="${dir.publish}/${dir.js}/${scripts.sha}.js" />
+    </target>
+    
+    <target name="-js.scripts.debug.concat" depends="-js.debug.concat,-js.mylibs.debug.concat" if="build.concat.scripts">
         <echo message="Concatenating library file with main script file"/>
         <!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
         <concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.min.js">
@@ -600,15 +651,6 @@
         <copy todir="${dir.intermediate}" overwrite="${needhtmlrefresh}">
             <fileset dir="${dir.source}" includes="${page-files}"/>
         </copy>
-
-        <!-- switch from a regular jquery to minified -->
-        <replaceregexp match="jquery-(\d|\d(\.\d)+)\.js" replace="jquery-\1.min.js" flags="g">
-            <fileset dir="./${dir.intermediate}" includes="${page-files}"/>
-        </replaceregexp>
-        <!-- switch any google CDN reference to minified -->
-        <replaceregexp match="(\d|\d(\.\d)+)\/jquery\.js" replace="\1/jquery.min.js" flags="g">
-            <fileset dir="./${dir.intermediate}" includes="${page-files}"/>
-        </replaceregexp>    
 
         <echo>Kill off those versioning flags: ?v=2</echo>
         <replaceregexp match='\?v=\d+">' replace='">' flags="g">
