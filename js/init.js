@@ -31,7 +31,7 @@
 		// setup environment pathes
 		Public.environment	= {
 			jsPath:		'/js/',
-			modulePath:	'/js/modules'
+			modulePath:	'/js/modules/'
 		};
 		
 		Public.name			= 'TypeofNaN 2.0 Website';

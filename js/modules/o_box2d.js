@@ -10,12 +10,12 @@
  * Changed: 2011-11-12
  */
 
-!(function _module_box3d_wrap( win, doc, undef ) {
+!(function _module_box2d_wrap( win, doc, undef ) {
 	"use strict";
 	var BF		= win.BarFoos = win.BarFoos || { },
 		Modules	= BF.Modules = BF.Modules || { },
 	
-	Box3D = function _Box3D( Sandbox, App, secret ) {
+	Box2D = function _Box2D( Sandbox, App, secret ) {
 		secret	= secret || { };
 		
 		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
@@ -91,7 +91,7 @@
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
 			
-			alert('Box3D - ICH BIINN DAAAAAA!!');
+			console.log('Box2D - Foo');
 			
 			return Private;
 		};
@@ -99,5 +99,5 @@
 		return Public;
 	};
 	
-	Modules.Box3D = Box3D;
+	Modules.Box2D = Box2D;
 }( window, window.document ));

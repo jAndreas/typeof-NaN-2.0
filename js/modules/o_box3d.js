@@ -15,7 +15,7 @@
 	var BF		= win.BarFoos = win.BarFoos || { },
 		Modules	= BF.Modules = BF.Modules || { },
 	
-	Box2D = function _Box2D( Sandbox, App, secret ) {
+	Box3D = function _Box3D( Sandbox, App, secret ) {
 		secret	= secret || { };
 		
 		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
@@ -91,7 +91,7 @@
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
 			
-			alert('Box2D - Foo');
+			console.log('Box3D - ICH BIINN DAAAAAA!!');
 			
 			return Private;
 		};
@@ -99,5 +99,5 @@
 		return Public;
 	};
 	
-	Modules.Box2D = Box2D;
+	Modules.Box3D = Box3D;
 }( window, window.document ));

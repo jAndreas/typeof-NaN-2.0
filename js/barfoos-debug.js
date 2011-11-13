@@ -10399,12 +10399,14 @@ $.transform = {
 						}
 					};
 					
-					scr.onerror		= promise.reject;
+					scr.onerror		= function _onerror( err ) {
+						promise.reject( moduleID, err );
+					};
 					
 					scr.type		= 'text/javascript';
 					scr.async		= true;
 					scr.defer		= true;
-					scr.src			= Private.modulePath + Private.modulePrefix + moduleID.toLowerCase();
+					scr.src			= Private.modulePath + Private.modulePrefix + moduleID.toLowerCase() + '.js';
 					
 					head.insertBefore( scr, head.firstChild );
 				}).promise();
@@ -10451,17 +10453,16 @@ $.transform = {
 						$.when( data.creator ).then(function _done( moduleName, moduleCreator ) {
 							data.creator = moduleCreator || data.creator;
 					
-							instances.push( data.creator( Sandbox( this ), Application, args ) );
-							instances[ 0 ].moduleKey = Private.globalModuleKey;
-							initResult = instances[ 0 ].init();
-							data.multipleInstances = instances[ 0 ].multipleInstances;
+							instances.push( data.creator( Sandbox( Core ), Application, args ) );
+							instances[ 0 ].moduleKey	= Private.globalModuleKey;
+							initResult					= instances[ 0 ].init();
+							data.multipleInstances		= instances[ 0 ].multipleInstances;
 							
 							if( initResult === -1 ) {
 								Public.stop( moduleID, instances[ 0 ].moduleKey );
 							}
-						}, function _fail( err ) {
-							console.log(err);
-							console.log('unable to load module ', moduleName );
+						}, function _fail( moduleName, err ) {
+							// TODO: I did not decide what to do here. Try reloading the module ? Throw ? Warn? 
 						});
 					}
 				} catch( ex ) {
