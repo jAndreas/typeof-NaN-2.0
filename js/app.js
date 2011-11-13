@@ -18,16 +18,25 @@
 	if( Object.hasKeys( BF, 'Core Sandbox' ) && Object.hasKeys( BFapps, 'TypeofNaN' ) ) {
 		var	Core		= BF.Core,
 			Sandbox		= BF.Sandbox,
-			Modules		= BF.Modules;
+			Modules		= BF.Modules,
+			App			= BFapps.TypeofNaN;
 	
 		// register Sandbox
 		Core.registerSandbox( Sandbox );
 		
 		// register Modules
 		Core.registerModule( 'Window', Modules.Window );
+				
+		if( Core.createCSS( 'perspective' ) ) {
+			Core.registerModule( 'Box3D' );
+		}
+		else {
+			Core.registerModule( 'Box2D' );
+		}
 		
 		// startup all registered Modules
 		Core.startAll();
+
 
 		// register Modules which are not loaded immediately / deferred
 		//Core.registerModule( 'Journal', Modules.Journal );

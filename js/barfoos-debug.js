@@ -10308,7 +10308,8 @@ $.transform = {
 
 !(function _core_wrap( win, doc, $, undef ) {
 	"use strict";
-	var BF = win.BarFoos = win.BarFoos || { },
+	var BF		= win.BarFoos = win.BarFoos || { },
+		Modules	= BF.Modules = BF.Modules || { },
 	
 	Core = (function _Core() {
 		var moduleData	= { },
@@ -10322,6 +10323,10 @@ $.transform = {
 		Public.registerApplication = function _registerApplication( app ) {
 			if( Object.type( app ) === 'Object' ) {
 				Application = app;
+				
+				if( 'environment' in Application ) {
+					$.extend( Private, Application.environment );
+				}
 			}
 			else {
 				Public.error({
@@ -10352,10 +10357,10 @@ $.transform = {
 		};
 		
 		Public.registerModule = function _registerModule( moduleID, creator ) {
-			if( Object.type( moduleID ) === 'String' && Object.type( creator ) === 'Function' ) {
+			if( Object.type( moduleID ) === 'String' ) {
 				if( !(moduleID in moduleData) ) {
 					moduleData[ moduleID ] = {
-						creator: creator,
+						creator: creator || Public.loadModule( moduleID ),
 						instances: [ ]
 					};
 				}
@@ -10375,22 +10380,22 @@ $.transform = {
 					type:	'type',
 					origin:	'Core',
 					name:	'_registerModule',
-					msg:	'string/function pair expected, received ' + getLastError( -2 ) + '/' + getLastError( -1 ) + ' instead'
+					msg:	'string expected, received ' + getLastError() + ' instead'
 				});
 			}
 			
 			return Public;
 		};
 		
-		Public.loadModule = function _loadModule( path, moduleID ) {
-			var scr		= doc.createElement( 'script' ),
-				head	= doc.head || doc.getElementsByTagName( 'head' )[ 0 ] || doc.documentElement;
-		
-			return $.Deferred( function _createDeferred( promise ) {
-				if( typeof path === 'string' ) {
+		Public.loadModule = function _loadModule( moduleID ) {
+			if( Object.type( moduleID ) === 'String' ) {
+				var scr		= doc.createElement( 'script' ),
+					head	= doc.head || doc.getElementsByTagName( 'head' )[ 0 ] || doc.documentElement;
+			
+				return $.Deferred( function _createDeferred( promise ) {
 					scr.onload		= function _onload() {
 						if( !scr.readyState || /complete|loaded/.test( scr.readyState ) ) {
-							promise.resolve();
+							promise.resolve( moduleID, Modules[ moduleID ] );
 						}
 					};
 					
@@ -10399,14 +10404,19 @@ $.transform = {
 					scr.type		= 'text/javascript';
 					scr.async		= true;
 					scr.defer		= true;
-					scr.src			= path;
+					scr.src			= Private.modulePath + Private.modulePrefix + moduleID.toLowerCase();
 					
 					head.insertBefore( scr, head.firstChild );
-				}
-				else {
-					promise.reject();
-				}
-			}).promise();
+				}).promise();
+			}
+			else {
+				Public.error({
+					type:	'type',
+					origin:	'Core',
+					name:	'_loadModule',
+					msg:	'string was expected, received ' + getLastError() + ' instead'
+				});
+			}
 		};
 		
 		Public.start = function _start( moduleID, args ) {
@@ -10438,14 +10448,21 @@ $.transform = {
 						}
 					}
 					else {
-						instances.push( data.creator( Sandbox( this ), Application, args ) );
-						instances[ 0 ].moduleKey = Private.globalModuleKey;
-						initResult = instances[ 0 ].init();
-						data.multipleInstances = instances[ 0 ].multipleInstances;
-						
-						if( initResult === -1 ) {
-							Public.stop( moduleID, instances[ 0 ].moduleKey );
-						}
+						$.when( data.creator ).then(function _done( moduleName, moduleCreator ) {
+							data.creator = moduleCreator || data.creator;
+					
+							instances.push( data.creator( Sandbox( this ), Application, args ) );
+							instances[ 0 ].moduleKey = Private.globalModuleKey;
+							initResult = instances[ 0 ].init();
+							data.multipleInstances = instances[ 0 ].multipleInstances;
+							
+							if( initResult === -1 ) {
+								Public.stop( moduleID, instances[ 0 ].moduleKey );
+							}
+						}, function _fail( err ) {
+							console.log(err);
+							console.log('unable to load module ', moduleName );
+						});
 					}
 				} catch( ex ) {
 					Public.error({
@@ -10640,7 +10657,12 @@ $.transform = {
 		}());
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^BLOCK END^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		
-		Private.globalModuleKey = 0;
+		$.extend(Private, {
+			globalModuleKey:	0,
+			jsPath:				'/js',
+			modulePath:			'/js/modules/',
+			modulePrefix:		'm_'
+		});
 		
 		Private.formatStacktrace = function( strace ) {
 			if( Object.type( strace ) === 'String' ) {
@@ -11058,53 +11080,55 @@ $.transform = {
 		Private.messagePool = { };
 
 		Public.dispatch = function _dispatch( messageInfo ) {
-			var listenerCount = 0;
-			
-			if( Object.type( messageInfo ) === 'Object' ) {
-				if( typeof messageInfo.name === 'string' ) {
-			//console.groupCollapsed('MEDIATOR: Dispatching event ', messageInfo.name);
-					if( messageInfo.name in Private.messagePool ) {
-						Private.messagePool[ messageInfo.name ].some(function _some( listener, idx ) {
-							try {
-						//	console.info( 'eventData for listener #' + idx );
-						//	console.dir( messageInfo );
-								listener.callback.apply( listener.scope, [ messageInfo ] );
-								listenerCount++;
-							} catch( ex ) {
-								Public.error({
-									type:	'error',
-									origin:	'Core COM',
-									name:	'_dispatch -> _forEach',
-									msg:	'unable to dispatch event "' + messageInfo.name + '". Original error: "' + ex.message + '"'
-								});
-							}
+			win.setTimeout(function _setTimeoutDispatch() {
+				var listenerCount = 0;
+				
+				if( Object.type( messageInfo ) === 'Object' ) {
+					if( typeof messageInfo.name === 'string' ) {
+				//console.groupCollapsed('MEDIATOR: Dispatching event ', messageInfo.name);
+						if( messageInfo.name in Private.messagePool ) {
+							Private.messagePool[ messageInfo.name ].some(function _some( listener, idx ) {
+								try {
+							//	console.info( 'eventData for listener #' + idx );
+							//	console.dir( messageInfo );
+									listener.callback.apply( listener.scope, [ messageInfo ] );
+									listenerCount++;
+								} catch( ex ) {
+									Public.error({
+										type:	'error',
+										origin:	'Core COM',
+										name:	'_dispatch -> _forEach',
+										msg:	'unable to dispatch event "' + messageInfo.name + '". Original error: "' + ex.message + '"'
+									});
+								}
+							
+								return messageInfo.stopPropagation;
+							});
+						}
 						
-							return messageInfo.stopPropagation;
+						if( typeof messageInfo.callback === 'function' ) {
+							messageInfo.callback( listenerCount, messageInfo.response );
+						}
+				//console.groupEnd();
+					}
+					else {
+						Public.error({
+							type:	'syntax',
+							origin:	'Core COM',
+							name:	'_dispatch',
+							msg:	'expected an event type as string'
 						});
 					}
-					
-					if( typeof messageInfo.callback === 'function' ) {
-						messageInfo.callback( listenerCount, messageInfo.response );
-					}
-			//console.groupEnd();
 				}
 				else {
 					Public.error({
 						type:	'syntax',
 						origin:	'Core COM',
 						name:	'_dispatch',
-						msg:	'expected an event type as string'
+						msg:	'expected an object'
 					});
 				}
-			}
-			else {
-				Public.error({
-					type:	'syntax',
-					origin:	'Core COM',
-					name:	'_dispatch',
-					msg:	'expected an object'
-				});
-			}
+			}, 0);
 			
 			return Public;
 		};
@@ -11513,6 +11537,9 @@ $.transform = {
 			toggleClass: function _toggleClass() {
 				$.fn.toggleClass.apply( this, arguments );
 				return this;
+			},
+			hasClass: function _hasClass() {
+				return $.fn.hasClass.apply( this, arguments );
 			},
 			css: function _css( prop, value ) {
 				if( value === 0 || value === "" || value || Object.type( prop ) === 'Object' ) {
