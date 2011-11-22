@@ -1,5 +1,5 @@
 /*
- * HTML5 ✰ Boilerplate
+ * HTML5 ✰ Boilerplate // BarFoos edition
  *
  * What follows is the result of much research on cross-browser styling.
  * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
@@ -214,11 +214,31 @@ div#container{
 	text-align: center;
 	width: 100%;
 	height: 100%;
+	
+	-webkit-perspective: 800;
+	-webkit-perspective-origin: 50% 200px;
+	-moz-perspective: 800;
+	-moz-perspective-origin: 50% 200px;
+	-o-perspective: 800;
+	-o-perspective-origin: 50% 200px;
+	-ms-perspective: 800;
+	-ms-perspective-origin: 50% 200px;
 }
  
 div#main {
-	width: 740px;
-	height: 480px;
+	width: 400px;
+	height: 400px;
+	position: relative;
+	
+	margin: 10% auto auto;
+	opacity: 1;
+}
+
+.boxFace {
+	position: absolute;
+	width: 360px;
+	height: 360px;
+	padding: 20px;
 	
 	background: -moz-linear-gradient(top, #12224F, #FFEDF9) repeat scroll 0 0 #005; /* Chrome 10+, Saf5.1+ */
 	background: -webkit-gradient(linear, left top, left bottom, from(#12224F), to(#FFEDF9)) repeat scroll 0 0 #005; /* Saf4+, Chrome */
@@ -228,24 +248,9 @@ div#main {
 	background: linear-gradient(top, #444444, #999999) repeat scroll 0 0 #005; /* W3C */
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#444444', EndColorStr='#999999'); /* IE6â€“IE9 */
 	
-	-moz-box-shadow: 0 0 12px 1px rgba(40, 40, 40, 0.8);
-	-webkit-box-shadow: 0 0 12px 1px rgba(40, 40, 40, 0.8);
-	-o-box-shadow: 0 0 12px 1px rgba(40, 40, 40, 0.8);
-	-ms-box-shadow: 0 0 12px 1px rgba(40, 40, 40, 0.8);
-	box-shadow: 0 0 12px 1px rgba(40, 40, 40, 0.8);
-	
-	-moz-border-radius: 8px 8px 8px 8px;
-	-webkit-border-radius: 8px 8px 8px 8px;
-	-o-border-radius: 8px 8px 8px 8px;
-	-ms-border-radius: 8px 8px 8px 8px;
-	border-radius: 8px 8px 8px 8px;
-	
-	border: 1px solid rgba(255,255,255,0.8);
-	margin: 2% auto auto;
-	opacity: 0.7;
+	border: 1px solid rgba(40, 40, 150, 0.5);
+	opacity: 1;
 }
-
-
 
 
 

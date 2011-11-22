@@ -20,21 +20,32 @@
 		
 		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
 			Private	= { 
-				deploymentData: { 
+				deploymentData: 	{ 
 					rootNode: '#main'
 				},
-				nodes:				{ }
+				nodes:				{ },
+				creationData:		[
+					[ 0, 0, 0 ],
+					[ 90, 0, 0 ],
+					[ 0, 90, 0 ],
+					[ 0, 180, 0 ],
+					[ 0, -90, 0 ],
+					[ -90, 0, 180 ]
+				]
 			},
 			$$		= Sandbox.$;
 
 		/****** Core Methods (called by the core only) *********** *******/
 		/****** ************************************************** *******/
 		Public.init = function _init() {
-			Sandbox.listen( [	'GetWindowDimensions',
-								'GetWindowScrollOffsets' ], Private.eventHandler, this );
+			Sandbox.listen( [	'Dummy' ], Private.eventHandler, this );
 			
 			Public.deployAs( 'static', Private.deploymentData ).then(function _done( rootNode ) {
-				Private.cacheElements( rootNode ).bindDOMevents().initElements();
+				Private
+					.create3DBox( rootNode )
+					.cacheElements( rootNode )
+					.bindDOMevents()
+					.initElements();
 			}, function _fail( err ) {
 				Public.moduleErrorHandler( err ).destroy();
 			});
@@ -43,8 +54,7 @@
 		Public.destroy = function _destroy() {
 			secret.clearNodeBindings();
 			
-			Sandbox.forget( [	'GetWindowDimensions',
-								'GetWindowScrollOffsets' ], Private.eventHandler );
+			Sandbox.forget( [	'Dummy' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
@@ -56,11 +66,7 @@
 				rootNode	= nodes.rootNode;
 			
 			switch( event.name ) {
-				case 'GetWindowDimensions':
-					event.response = Private.currentDimensions;
-					break;
-				case 'GetWindowScrollOffsets':
-					event.response = Private.currentOffsets;
+				case 'Dummy':
 					break;
 			}
 		};
@@ -77,8 +83,7 @@
 		// bindDOMevents will take care of browser DOM level events
 		Private.bindDOMevents = function _bindDOMevents() {
 			var	nodes			= secret.nodes,
-				rootNode		= nodes.rootNode,
-				scrollBalancer	= null;
+				rootNode		= nodes.rootNode;
 			
 			if( nodes ) {
 			}
@@ -91,11 +96,25 @@
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
 			
-			console.log('Box3D - ICH BIINN DAAAAAA!!');
+			rootNode.css({ transformStyle:	'preserve-3d' });
 			
 			return Private;
 		};
-					
+		
+		// module specific method
+		Private.create3DBox = function _create3DBox( rootNode ) {
+			Private.creationData.forEach(function _forEach( side, index ) {
+				$$( '<div>', {
+					'class':	'boxFace',
+					'css':		{
+						transform:	'rotateX(' + side[ 0 ] + 'deg) rotateY(' + side [ 1 ] + 'deg) translateZ(200px) rotate(' + side[ 2 ] + 'deg)'
+					}
+				}).appendTo( rootNode );
+			});
+			
+			return Private;
+		};
+		
 		return Public;
 	};
 	

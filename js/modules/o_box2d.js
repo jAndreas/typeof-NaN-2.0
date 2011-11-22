@@ -1,7 +1,7 @@
 /**
  * BarFoos Module (Layer 3)
  * -----------------------------------------
- * Box3D: This module handles the center box with help of CSS3 in 3D
+ * Box2D: This module handles the center box with help of CSS3 in good old fashion 2D
  *
  * This code runs in strict mode (if supported by the environment).
  * -----------------------------------------
@@ -10,7 +10,7 @@
  * Changed: 2011-11-12
  */
 
-!(function _module_box2d_wrap( win, doc, undef ) {
+!(function _module_box3d_wrap( win, doc, undef ) {
 	"use strict";
 	var BF		= win.BarFoos = win.BarFoos || { },
 		Modules	= BF.Modules = BF.Modules || { },
@@ -30,8 +30,7 @@
 		/****** Core Methods (called by the core only) *********** *******/
 		/****** ************************************************** *******/
 		Public.init = function _init() {
-			Sandbox.listen( [	'GetWindowDimensions',
-								'GetWindowScrollOffsets' ], Private.eventHandler, this );
+			Sandbox.listen( [	'Dummy' ], Private.eventHandler, this );
 			
 			Public.deployAs( 'static', Private.deploymentData ).then(function _done( rootNode ) {
 				Private.cacheElements( rootNode ).bindDOMevents().initElements();
@@ -43,8 +42,7 @@
 		Public.destroy = function _destroy() {
 			secret.clearNodeBindings();
 			
-			Sandbox.forget( [	'GetWindowDimensions',
-								'GetWindowScrollOffsets' ], Private.eventHandler );
+			Sandbox.forget( [	'Dummy' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
@@ -56,11 +54,7 @@
 				rootNode	= nodes.rootNode;
 			
 			switch( event.name ) {
-				case 'GetWindowDimensions':
-					event.response = Private.currentDimensions;
-					break;
-				case 'GetWindowScrollOffsets':
-					event.response = Private.currentOffsets;
+				case 'Dummy':
 					break;
 			}
 		};
@@ -77,8 +71,7 @@
 		// bindDOMevents will take care of browser DOM level events
 		Private.bindDOMevents = function _bindDOMevents() {
 			var	nodes			= secret.nodes,
-				rootNode		= nodes.rootNode,
-				scrollBalancer	= null;
+				rootNode		= nodes.rootNode;
 			
 			if( nodes ) {
 			}
@@ -91,7 +84,7 @@
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
 			
-			console.log('Box2D - Foo');
+			console.log('Box2D - yo');
 			
 			return Private;
 		};
