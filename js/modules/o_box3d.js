@@ -21,17 +21,19 @@
 		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
 			Private	= { 
 				deploymentData: 	{ 
-					rootNode: '#main'
+					rootNode: '#box'
 				},
 				nodes:				{ },
 				creationData:		[
-					[ 0, 0, 0 ],
-					[ 90, 0, 0 ],
-					[ 0, 90, 0 ],
-					[ 0, 180, 0 ],
-					[ 0, -90, 0 ],
-					[ -90, 0, 180 ]
-				]
+					[ 0, 0, 0, 'front' ],
+					[ 90, 0, 0, 'top' ],
+					[ 0, 90, 0, 'right' ],
+					[ 0, 180, 0, 'back' ],
+					[ 0, -90, 0, 'left' ],
+					[ -90, 0, 180, 'bottom' ]
+				],
+				xAngle:				35,
+				yAngle:				0
 			},
 			$$		= Sandbox.$;
 
@@ -74,7 +76,7 @@
 		// cacheElements() extends secret.nodes with DOM element references
 		Private.cacheElements = function _cacheElements( rootNode ) {
 			Sandbox.extend( secret.nodes, {
-				rootNode:			rootNode
+				rootNode:	rootNode
 			});
 			
 			return Private;
@@ -86,6 +88,19 @@
 				rootNode		= nodes.rootNode;
 			
 			if( nodes ) {
+				rootNode.on( 'mouseenter', '.boxFace', function _boxFaceMouseEnter( e ) {
+					var $$this		= secret.findCachedNode( this ) || $$( this );
+					
+					$$this.stop( true ).animate({
+						opacity:	0.15
+					}, 600 );
+				}).on( 'mouseleave', '.boxFace', function _boxFaceMouseLeave( e ) {
+					var $$this		= secret.findCachedNode( this ) || $$( this );
+					
+					$$this.stop( true ).animate({
+						opacity:	1
+					}, 400 );
+				});
 			}
 			
 			return Private;
@@ -96,7 +111,16 @@
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
 			
-			rootNode.css({ transformStyle:	'preserve-3d' });
+			rootNode.css({
+				transformStyle:	'preserve-3d'
+			}).animate({
+				opacity:	0.3
+			}, 3000, function _afterOpacity() {
+				rootNode.animate({
+					transform:	'rotateX(' + Private.xAngle + 'deg) rotateY(' + Private.yAngle + 'deg)',
+					opacity:	0.9
+				}, 2000, Private.boxRotate);
+			});
 			
 			return Private;
 		};
@@ -104,13 +128,27 @@
 		// module specific method
 		Private.create3DBox = function _create3DBox( rootNode ) {
 			Private.creationData.forEach(function _forEach( side, index ) {
-				$$( '<div>', {
+				secret.nodes[ side[ 3 ] ] = $$( '<div>', {
 					'class':	'boxFace',
 					'css':		{
 						transform:	'rotateX(' + side[ 0 ] + 'deg) rotateY(' + side [ 1 ] + 'deg) translateZ(200px) rotate(' + side[ 2 ] + 'deg)'
 					}
 				}).appendTo( rootNode );
 			});
+			
+			return Private;
+		};
+		
+		Private.boxRotate = function _boxRotate() {
+			var nodes		= secret.nodes,
+				rootNode	= nodes.rootNode;
+				
+			Private.xAngle = Private.xAngle * -1;
+			Private.yAngle += 340;
+		
+			rootNode.animate({
+				transform:	'rotateX(' + Private.xAngle + 'deg) rotateY(' + Private.yAngle + 'deg)'
+			}, 20000, _boxRotate, 'linear');
 			
 			return Private;
 		};

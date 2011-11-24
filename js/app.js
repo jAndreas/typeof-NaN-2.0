@@ -20,7 +20,6 @@
 			Sandbox		= BF.Sandbox,
 			Modules		= BF.Modules,
 			App			= BFapps.TypeofNaN;
-	
 		// register Sandbox
 		Core.registerSandbox( Sandbox );
 		

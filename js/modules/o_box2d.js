@@ -21,7 +21,7 @@
 		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
 			Private	= { 
 				deploymentData: { 
-					rootNode: '#main'
+					rootNode: '#box'
 				},
 				nodes:				{ }
 			},
@@ -84,7 +84,7 @@
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
 			
-			console.log('Box2D - yo');
+			alert('Without a webkit browser, there is not much to see for you right now');
 			
 			return Private;
 		};

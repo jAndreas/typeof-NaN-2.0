@@ -472,8 +472,7 @@
     <!-- This is a private target -->
     
         <echo message="Copying over new files..."/>
-
-        <copy todir="./${dir.publish}">
+        <copy todir="${dir.publish}">
             <fileset dir="${dir.source}/" excludes="${file.default.exclude}, ${file.exclude}">
                 <!-- exclude files that are superseded by optimized versions with different names -->
                 <!-- this is not strictly necessary, but it avoids putting unreferenced files into your server -->
@@ -482,6 +481,9 @@
                 <exclude name="${file.manifest}"/>
             </fileset>
         </copy>
+		
+		<echo message="Cleaning up intermediate folder..."/>
+		<delete dir="./${dir.intermediate}/"/>
         
         <echo message="A copy of all non-dev files are now in: ./${dir.publish}."/>
     </target>
@@ -490,8 +492,7 @@
     <!-- This is a private target -->
     
         <echo message="Copying over new files..."/>
-
-        <copy todir="./${dir.publish}">
+        <copy todir="${dir.publish}">
             <fileset dir="${dir.source}/" excludes="${file.default.exclude}, ${file.exclude}, index.html">
                 <!-- exclude files that are superseded by optimized versions with different names -->
                 <!-- this is not strictly necessary, but it avoids putting unreferenced files into your server -->
@@ -501,6 +502,9 @@
             </fileset>
         </copy>
         <copy file="${dir.intermediate}/index.html" tofile="${dir.publish}/index.html" />
+		
+		<echo message="Cleaning up intermediate folder..."/>
+		<delete dir="./${dir.intermediate}/"/>
         
         <echo message="A copy of all non-dev files are now in: ./${dir.publish}."/>
     </target>
@@ -674,7 +678,7 @@
         </copy>
         
         <!-- rename all optional flagged modules, we just didn't want to inlcude those into the main js file -->
-		<move todir="./${dir.publish}/${dir.js}/modules/">
+		<move todir="${dir.publish}/${dir.js}/modules/">
 			<fileset dir="./${dir.intermediate}/${dir.js}/modules/">
 				<include name="**/o_*.js"/>
 			</fileset>
@@ -863,7 +867,7 @@
         <echo message=" - maintaining whitespace"/>
         <echo message=" - removing html comments"/>
         <echo message=" - compressing inline style/script tag contents"/>
-        <apply executable="java" parallel="false" dest="./${dir.publish}/" >
+        <apply executable="java" parallel="false" dest="${dir.publish}/" >
             <fileset dir="./${dir.intermediate}/" includes="${page-files}"/>
             <arg value="-jar"/>
             <arg path="./${dir.build.tools}/${tool.htmlcompressor}"/>
@@ -875,7 +879,7 @@
             <arg line="--preserve-ssi"/>
             <srcfile/>
             <arg value="-o"/>
-            <mapper type="glob" from="*" to="../${dir.publish}/*"/>
+            <mapper type="glob" from="*" to="${dir.publish}/*"/>
             <targetfile/>
         </apply>
     </target>
@@ -886,7 +890,7 @@
         <echo message=" - maintaining whitespace"/>
         <echo message=" - retain html comments"/>
         <echo message=" - compressing inline style/script tag contents"/>
-        <apply executable="java" parallel="false" dest="./${dir.publish}/" >
+        <apply executable="java" parallel="false" dest="${dir.publish}/" >
             <fileset dir="./${dir.intermediate}/" includes="${page-files}"/>
             <arg value="-jar"/>
             <arg path="./${dir.build.tools}/${tool.htmlcompressor}"/>
@@ -898,7 +902,7 @@
             <arg line="--preserve-ssi"/>
             <srcfile/>
             <arg value="-o"/>
-            <mapper type="glob" from="*" to="../${dir.publish}/*"/>
+            <mapper type="glob" from="*" to="${dir.publish}/*"/>
             <targetfile/>
         </apply>
     </target>
@@ -909,7 +913,7 @@
         <echo message=" - removing unnecessary whitespace"/>
         <echo message=" - removing html comments"/>
         <echo message=" - compressing inline style/script tag contents"/>
-        <apply executable="java" parallel="false" dest="./${dir.publish}/" >
+        <apply executable="java" parallel="false" dest="${dir.publish}/" >
             <fileset dir="./${dir.intermediate}/" includes="${page-files}"/>
             <arg value="-jar"/>
             <arg path="./${dir.build.tools}/${tool.htmlcompressor}"/>
@@ -920,7 +924,7 @@
             <arg line="--preserve-ssi"/>
             <srcfile/>
             <arg value="-o"/>
-            <mapper type="glob" from="*" to="../${dir.publish}/*"/>
+            <mapper type="glob" from="*" to="${dir.publish}/*"/>
             <targetfile/>
         </apply>
     </target>
@@ -1078,7 +1082,7 @@
             <arg path="${dir.build.tools}/${tool.yuicompressor}"/>
             <srcfile/>
             <arg line="-o"/>
-            <mapper type="glob" from="*.css" to="${basedir}/${dir.publish}/${dir.css}/*.css"/>
+            <mapper type="glob" from="*.css" to="${dir.publish}/${dir.css}/*.css"/>
             <targetfile/>
         </apply>
         <foreach list="${file.stylesheets}" param="css_file" target="-css-remove-concatenated-stylesheets" />        
@@ -1104,11 +1108,11 @@
             <then>
                 <!-- work around https://sourceforge.net/tracker/?func=detail&aid=2671422&group_id=151404&atid=780916 -->
                 <delete>
-                    <fileset dir="./${dir.publish}/${dir.images}/">
+                    <fileset dir="${dir.publish}/${dir.images}/">
                         <include name="**/*.png"/>
                     </fileset>
                 </delete>
-                <apply executable="optipng" dest="./${dir.publish}/${dir.images}/" osfamily="unix">
+                <apply executable="optipng" dest="${dir.publish}/${dir.images}/" osfamily="unix">
                     <fileset dir="./${dir.source}/${dir.images}/" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
                     <arg value="-quiet"/>
                     <arg value="-o7"/>
@@ -1130,11 +1134,11 @@
 
         <!-- work around https://sourceforge.net/tracker/?func=detail&aid=2671422&group_id=151404&atid=780916 -->
         <delete>
-            <fileset dir="./${dir.publish}/${dir.images}/">
+            <fileset dir="${dir.publish}/${dir.images}/">
                 <include name="**/*.png"/>
             </fileset>
         </delete>
-        <apply executable="${basedir}/${dir.build.tools}/optipng-0.6.4-exe/optipng.exe" dest="./${dir.publish}/${dir.images}/" osfamily="windows">
+        <apply executable="${basedir}/${dir.build.tools}/optipng-0.6.4-exe/optipng.exe" dest="${dir.publish}/${dir.images}/" osfamily="windows">
             <fileset dir="./${dir.source}/${dir.images}/" includes="**/*.png"  excludes="${images.bypass}, ${images.default.bypass}"/>
             <arg value="-quiet"/>
             <arg value="-o7"/>
@@ -1166,7 +1170,7 @@
                 <available file="jpegtran" filepath="${ENV.PATH}" />
             </and>
             <then>
-                <apply executable="jpegtran" dest="./${dir.publish}/${dir.images}" osfamily="unix">
+                <apply executable="jpegtran" dest="${dir.publish}/${dir.images}" osfamily="unix">
                     <fileset dir="${dir.source}/${dir.images}" includes="**/*.jpg" excludes="${images.bypass}, ${images.default.bypass}"/>
                     <arg value="-copy"/>
                     <arg value="${strip-meta-tags}"/>
@@ -1189,7 +1193,7 @@
             </elseif>
         </if>
 
-        <apply executable="${basedir}/${dir.build.tools}/jpegtran.exe" dest="./${dir.publish}/${dir.images}" osfamily="windows">
+        <apply executable="${basedir}/${dir.build.tools}/jpegtran.exe" dest="${dir.publish}/${dir.images}" osfamily="windows">
             <fileset dir="${dir.source}/${dir.images}" includes="**/*.jpg"  excludes="${images.bypass}, ${images.default.bypass}"/>
             <arg value="-copy"/>
             <arg value="${strip-meta-tags}"/>
@@ -1207,7 +1211,7 @@
     <target name="-imgcopy" depends="-mkdirs">
         <echo message="Copying over the unmodified images."/>
 
-        <copy todir="./${dir.publish}/${dir.images}">
+        <copy todir="${dir.publish}/${dir.images}">
             <fileset dir="${dir.source}/${dir.images}"  includes="**/*.jpg, **/*.png"/>
         </copy> 
     </target>
