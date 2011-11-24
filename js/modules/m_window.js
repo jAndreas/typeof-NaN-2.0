@@ -135,8 +135,6 @@
 			// initialize data for the first time
 			Private.updateDimensions( rootNode ).updateOffsets( rootNode );
 			
-			alert('Apache ANT - you hate and love it at the same time!');
-			
 			return Private;
 		};
 		

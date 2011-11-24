@@ -510,7 +510,7 @@
 		<echo message="Concatenating Main JS scripts..."/>
 		<!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
 		<concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.js">
-			<filelist dir="./${dir.intermediate}/${dir.js}/" files="barfoos.js"/>
+			<filelist dir="./${dir.intermediate}/${dir.js.mylibs}/" files="barfoos.js"/>
 			<fileset dir="./${dir.intermediate}/${dir.js}/modules/">
 				<include name="**/*.js"/>
 				<exclude name="**/o_*.js"/>
@@ -536,7 +536,7 @@
         
 		<!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
 		<concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.js">
-			<filelist dir="./${dir.intermediate}/${dir.js}/" files="barfoos-debug.js"/>
+			<filelist dir="./${dir.intermediate}/${dir.js.mylibs}/" files="barfoos-debug.js"/>
 			<fileset dir="./${dir.intermediate}/${dir.js}/modules/">
 				<include name="**/*.js"/>
 				<exclude name="**/o_*.js"/>
