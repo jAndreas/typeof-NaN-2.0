@@ -481,6 +481,7 @@
                 <exclude name="${file.manifest}"/>
             </fileset>
         </copy>
+        <copy file="${dir.intermediate}/index.html" tofile="${dir.publish}/index.html" />
 		
 		<echo message="Cleaning up intermediate folder..."/>
 		<delete dir="./${dir.intermediate}/"/>

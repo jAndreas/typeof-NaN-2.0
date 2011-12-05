@@ -24,14 +24,14 @@
 					rootNode: '#box'
 				},
 				nodes:				{ },
-				creationData:		[
-					[ 0, 0, 0, 'front' ],
-					[ 90, 0, 0, 'top' ],
-					[ 0, 90, 0, 'right' ],
-					[ 0, 180, 0, 'back' ],
-					[ 0, -90, 0, 'left' ],
-					[ -90, 0, 180, 'bottom' ]
-				],
+				creationData:		{
+					front:		[ 0, 0, 0 ],
+					top:		[ 90, 0, 0 ],
+					right:		[ 0, 90, 0 ],
+					back:		[ 0, 180, 0 ],
+					left:		[ 0, -90, 0 ],
+					bottom:		[ -90, 0, 180, true ]
+				},
 				xAngle:				35,
 				yAngle:				0
 			},
@@ -91,15 +91,15 @@
 				rootNode.on( 'mouseenter', '.boxFace', function _boxFaceMouseEnter( e ) {
 					var $$this		= secret.findCachedNode( this ) || $$( this );
 					
-					$$this.stop( true ).animate({
-						opacity:	0.15
-					}, 600 );
+					$$this.css({
+						background:	'-webkit-linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005'
+					});
 				}).on( 'mouseleave', '.boxFace', function _boxFaceMouseLeave( e ) {
 					var $$this		= secret.findCachedNode( this ) || $$( this );
 					
-					$$this.stop( true ).animate({
-						opacity:	1
-					}, 400 );
+					$$this.css({
+						background:	'-webkit-linear-gradient(#12226F, #9FBDD9) repeat scroll 0 0 #005'
+					});
 				});
 			}
 			
@@ -114,26 +114,46 @@
 			rootNode.css({
 				transformStyle:	'preserve-3d'
 			}).animate({
-				opacity:	0.3
-			}, 3000, function _afterOpacity() {
+				opacity:	0.15
+			}, 1500, function _afterOpacity() {
 				rootNode.animate({
-					transform:	'rotateX(' + Private.xAngle + 'deg) rotateY(' + Private.yAngle + 'deg)',
-					opacity:	0.9
+					transform:	'rotateX(%rdeg) rotateY(%rdeg)'.sFormat( Private.xAngle, Private.yAngle ),
+					opacity:	0.98
 				}, 2000, Private.boxRotate);
 			});
+			
+			/*win.setInterval(function _flashLight() {
+				Object.keys( nodes ).some(function _forSome( name ) {
+					if( name === 'rootNode' )
+						return false;
+				
+					nodes[ name ].animate({
+						opacity:	0.32
+					}, ~~(Math.random()*1400), (function _afterReduceOpacity( node ) {
+						return function() {
+							node.animate({
+								opacity:	0.98
+							}, ~~(Math.random()*1400));
+						};
+					}( nodes[ name ] )));
+				});
+			}, ~~(Math.random() * 9000) + 4000);*/
 			
 			return Private;
 		};
 		
 		// module specific method
 		Private.create3DBox = function _create3DBox( rootNode ) {
-			Private.creationData.forEach(function _forEach( side, index ) {
-				secret.nodes[ side[ 3 ] ] = $$( '<div>', {
-					'class':	'boxFace',
-					'css':		{
-						transform:	'rotateX(' + side[ 0 ] + 'deg) rotateY(' + side [ 1 ] + 'deg) translateZ(200px) rotate(' + side[ 2 ] + 'deg)'
-					}
-				}).appendTo( rootNode );
+			var data;
+		
+			Object.keys( data = Private.creationData ).forEach(function _forEach( side ) {
+				secret.nodes[ side ] = $$( '<div>', {
+					'class':		'boxFace',
+					'transform':	'rotateX(0deg) rotateY(0deg) translateZ(200px) rotate(0deg)',
+					'text':			side
+				}).appendTo( rootNode ).delay(15, 'animate', {
+					transform:	'rotateX(%rdeg) rotateY(%rdeg) translateZ(200px) rotate(%rdeg)'.sFormat( data[ side ] )
+				}, 1500);
 			});
 			
 			return Private;
@@ -147,7 +167,7 @@
 			Private.yAngle += 340;
 		
 			rootNode.animate({
-				transform:	'rotateX(' + Private.xAngle + 'deg) rotateY(' + Private.yAngle + 'deg)'
+				transform:	'rotateX(%rdeg) rotateY(%rdeg)'.sFormat( Private.xAngle, Private.yAngle )
 			}, 20000, _boxRotate, 'linear');
 			
 			return Private;

@@ -9840,7 +9840,7 @@ $.transform = {
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-15
- * Modified: 2011-07-15 Modified Object.lookup()
+ * Modified: 2011-11-30 added .freeze() & .seal() polyfills and String.prototype.sFormat()
  */
 
 !(function _toolkit_wrap( win, doc, undef ) {
@@ -9947,6 +9947,19 @@ $.transform = {
 				}( key, transform.apply( obj, [ key, obj[ key ]] ) ));
 			});
 		}
+	};
+	
+	// simplified sprintf() - Non-standard
+	String.prototype.sFormat = function _simpleFormat( map ) {
+		var myString	= this.toString(),
+			args		= Object.type( map ) === 'Array' ? map : arguments,
+			next		= 0;
+	
+		while( ~myString.indexOf( '%r' ) ) {
+			myString = myString.replace( '%r', args[ next++ ] );
+		}
+		
+		return myString;
 	};
 	
 	// Object.lookup() - Non-standard. Trys to lookup a chain of objects. When finished we return two possible methods, "execute" & "get".
@@ -10313,7 +10326,7 @@ $.transform = {
  * -----------------------------------------
  * Author: Andreas Goebel
  * Date: 2011-03-17
- * Changed: 2011-08-11 - added "flaggedForRemoval" property to public module object on .stop()
+ * Changed: 2011-11-30 - loadModule is now IE compliant
  */
 
 !(function _core_wrap( win, doc, $, undef ) {
@@ -10586,15 +10599,7 @@ $.transform = {
 		Public.trim = function _trim() {
 			return $.trim.apply( null, arguments );
 		};
-		
-		Public.Promise = function _Promise() {
-			return $.Deferred.apply( null, arguments );
-		};
-		
-		Public.when	= function _when() {
-			return $.when.apply( null, arguments );
-		};
-		
+				
 		Public.extend = function _extend() {
 			return $.extend.apply( null, arguments );
 		};
@@ -11032,7 +11037,7 @@ $.transform = {
  * ------------------------------
  * Author: Andreas Goebel
  * Date: 2011-06-18
- * Changed: 2011-11-08 - added tiny connection validator
+ * Changed: 2011-11-30 - getJSON() now calls .ajax() explicitly - added timeout for requests
  */
 
 !(function _core_plugin_ajax_wrap() {
@@ -11042,8 +11047,32 @@ $.transform = {
 		/****** BASE LIBRARY ABSTRACTIONS ## JQUERY 1.7.0 ******** *******/
 		/****** ************************************************** *******/
 		var errorCount			= 0,
+			timeout				= 5000,
 			connectionStates	= { OK: 0, BAD: 1 },
 			state				= connectionStates.OK;
+
+		function connectionRestored() {
+			errorCount = 0;
+
+			switch( state ) {
+				case connectionStates.OK:
+					break;
+				case connectionStates.BAD:
+					Public.dispatch({ name: 'CORE_CONNECTION_RESTORED'});
+					state = connectionStates.OK;
+					break;
+			}
+		}
+
+		function badConnection() {
+			if( ++errorCount === 3 ) {
+				Public.dispatch({ name: 'CORE_BAD_CONNECTION', data: {
+					errorCount:	errorCount
+				}});
+				
+				state		= connectionStates.BAD;
+			}
+		}
 
 		Public.ajax = function _ajax() {
 			return $.ajax.apply( null, arguments ).done(function _done() {
@@ -11068,8 +11097,21 @@ $.transform = {
 			});
 		};		
 		
-		Public.getJSON = function _getJSON( ) {
-			return $.getJSON.apply( null, arguments );
+		Public.getJSON = function _getJSON( url ) {
+			return $.ajax({
+				url:		url,
+				dataType:	'json',
+				cache:		false,
+				timeout:	timeout,
+			}).done(function _done() {
+				connectionRestored();
+			}).fail(function _fail( jXhr, status, message ) {
+				if( message !== 'Not Found' ) {
+					badConnection();
+				} else {
+					connectionRestored();
+				}
+			});
 		};
 	});
 }());
@@ -11899,5 +11941,33 @@ $.transform = {
 				}
 			});
 		}
+	});
+}());/* 
+ * core_plugin_promises.js
+ * ------------------------------
+ * Core plugin: This plugin implements the BarFoos promise maker
+ * This is a clone from jQuerys Deferred objects written by Julian Aubourg, with some slight modifications
+ * 
+ * This code runs in strict mode (if supported by the environment).
+ * ------------------------------
+ * Author: Andreas Goebel
+ * Date: 2011-12-05
+ * Changed: 2011-12-05 - created
+ */
+
+!(function _core_plugin_promises_wrap() {
+	"use strict";
+	
+	Object.lookup( 'BarFoos.Core.plugin', 0 ).execute(function( win, doc, $, Private, Public, Sandbox, App, undef ) {
+		/****** BASE LIBRARY ABSTRACTIONS ## Zepto *************** *******/
+		/****** ************************************************** *******/
+		
+		Public.Promise = function _Promise() {
+			return $.Deferred.apply( null, arguments );
+		};
+		
+		Public.when	= function _when() {
+			return $.when.apply( null, arguments );
+		};
 	});
 }());
