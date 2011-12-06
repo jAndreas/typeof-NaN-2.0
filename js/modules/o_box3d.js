@@ -25,6 +25,7 @@
 				},
 				nodes:				{ },
 				creationData:		{
+					// rotateX, rotateY, rotate, skipInvert
 					front:		[ 0, 0, 0 ],
 					top:		[ 90, 0, 0 ],
 					right:		[ 0, 90, 0 ],
@@ -35,12 +36,13 @@
 				xAngle:				35,
 				yAngle:				0
 			},
-			$$		= Sandbox.$;
+			$$		= secret.$$;
 
 		/****** Core Methods (called by the core only) *********** *******/
 		/****** ************************************************** *******/
 		Public.init = function _init() {
-			Sandbox.listen( [	'Dummy' ], Private.eventHandler, this );
+			Sandbox.listen( [	'MenuEntryHovered',
+								'MenuEntryLeft' ], Private.eventHandler, this );
 			
 			Public.deployAs( 'static', Private.deploymentData ).then(function _done( rootNode ) {
 				Private
@@ -56,28 +58,38 @@
 		Public.destroy = function _destroy() {
 			secret.clearNodeBindings();
 			
-			Sandbox.forget( [	'Dummy' ], Private.eventHandler );
+			Sandbox.forget( [	'MenuEntryHovered',
+								'MenuEntryLeft' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		
 		// eventHandler takes care of application level events
 		Private.eventHandler = function _eventHandler( event ) {
-			var	eventData	= event.data,
-				nodes		= secret.nodes,
-				rootNode	= nodes.rootNode;
+			var	eventData		= event.data,
+				nodes			= secret.nodes,
+				rootNode		= nodes.rootNode;
 			
 			switch( event.name ) {
-				case 'Dummy':
+				case 'MenuEntryHovered':
+					rootNode.stop().delay(35, 'animate', {
+						transform:	'rotateX(%rdeg) rotateY(%rdeg) rotate(%rdeg)'.sFormat( Private.mapView( eventData.direction ) )
+					}, 1000);
+					break;
+				case 'MenuEntryLeft':
+					Private.boxRotate( 3000 );
 					break;
 			}
 		};
 		
 		// cacheElements() extends secret.nodes with DOM element references
 		Private.cacheElements = function _cacheElements( rootNode ) {
-			Sandbox.extend( secret.nodes, {
-				rootNode:	rootNode
-			});
+			Sandbox.extend( secret.nodes, (function _extendClosure() {
+				
+				return {
+					rootNode:		rootNode
+				};
+			}()));
 			
 			return Private;
 		};
@@ -89,13 +101,13 @@
 			
 			if( nodes ) {
 				rootNode.on( 'mouseenter', '.boxFace', function _boxFaceMouseEnter( e ) {
-					var $$this		= secret.findCachedNode( this ) || $$( this );
+					var $$this		= $$( this );
 					
 					$$this.css({
 						background:	'-webkit-linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005'
 					});
 				}).on( 'mouseleave', '.boxFace', function _boxFaceMouseLeave( e ) {
-					var $$this		= secret.findCachedNode( this ) || $$( this );
+					var $$this		= $$( this );
 					
 					$$this.css({
 						background:	'-webkit-linear-gradient(#12226F, #9FBDD9) repeat scroll 0 0 #005'
@@ -159,7 +171,7 @@
 			return Private;
 		};
 		
-		Private.boxRotate = function _boxRotate() {
+		Private.boxRotate = function _boxRotate( speed ) {
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
 				
@@ -168,9 +180,18 @@
 		
 			rootNode.animate({
 				transform:	'rotateX(%rdeg) rotateY(%rdeg)'.sFormat( Private.xAngle, Private.yAngle )
-			}, 20000, _boxRotate, 'linear');
+			}, speed || 20000, _boxRotate, 'linear');
 			
 			return Private;
+		};
+		
+		Private.mapView = function _mapView( direction ) {
+			var data		= this.creationData[ direction ],
+				skipInvert	= data[ 3 ]; 
+		
+			return data.map(function( value ) { 
+				return skipInvert ? value : value * -1;
+			});
 		};
 		
 		return Public;

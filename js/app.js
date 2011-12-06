@@ -20,11 +20,13 @@
 			Sandbox		= BF.Sandbox,
 			Modules		= BF.Modules,
 			App			= BFapps.TypeofNaN;
+			
 		// register Sandbox
 		Core.registerSandbox( Sandbox );
 		
 		// register Modules
 		Core.registerModule( 'Window', Modules.Window );
+		Core.registerModule( 'Navigation', Modules.Navigation );
 				
 		if( Core.createCSS( 'perspective' ) ) {
 			Core.registerModule( 'Box3D' );

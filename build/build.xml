@@ -234,123 +234,12 @@
     *************************************************
     -->
 
-    <!-- Target: basics -->
-    <target name="-basics.dev"
-            depends="-rev,
-                     -copy"/>
-
-    <target name="-basics.test"
-            depends="-rev,
-                     -usemin,
-                     -js.all.minify,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -copy"/>
-
-    <target name="-basics.production"
-            depends="-rev,
-                     -usemin,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -copy"/>
-
-    <!-- Target: text -->
-    <target name="-text.dev"
-            depends="-rev,
-                     -copy"/>
-
-    <target name="-text.test"
-            depends="-rev,
-                     -usemin,
-                     -js.all.minify,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -htmlclean,
-                     -copy"/>
-
-    <target name="-text.production"
-            depends="-rev,
-                     -usemin,
-                     -js.all.minify,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -htmlclean,
-                     -copy"/>
-
-    <!-- Target: buildkit -->
-    <target name="-buildkit.dev"
-            depends="-rev,
-                     -imagespng,
-                     -imagesjpg,
-                     -copy"/>
-
-    <target name="-buildkit.test"
-            depends="-rev,
-                     -usemin,
-                     -js.all.minify,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -htmlbuildkit,
-                     -imagespng,
-                     -imagesjpg,
-                     -copy"/>
-
-    <target name="-buildkit.production"
-            depends="-rev,
-                     -usemin,
-                     -js.all.minify,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -htmlbuildkit,
-                     -imagespng,
-                     -imagesjpg,
-                     -copy"/>
-
-    <!-- Target: build -->
-    <target name="-build.dev"
-            depends="-rev,
-                     -imagespng,
-                     -imagesjpg,
-                     -copy"/>
-
-    <target name="-build.test"
-            depends="-rev,
-                     -usemin,
-                     -js.all.minify,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -htmlclean,
-                     -imagespng,
-                     -imagesjpg,
-                     -copy"/>
-
     <target name="-build.production"
             depends="-rev,
+            		 -clean,
                      -usemin,
 				     -js.all.minify,
                      -js.main.concat,
-                     -js.mylibs.concat,
                      -js.scripts.concat,
                      -css,
                      -manifest,
@@ -361,49 +250,14 @@
                      
     <target name="-build.debug"
             depends="-rev,
+            		 -clean,
                      -js.debug.concat,
-                     -js.mylibs.debug.concat,
                      -js.scripts.debug.concat,
                      -css,
                      -usemin.debug,
                      -imagespng,
                      -imagesjpg,
                      -copy.debug"/>
-
-    <!-- Target: minify -->
-    <target name="-minify.dev"
-            depends="-rev,
-                     -imagespng,
-                     -imagesjpg,
-                     -copy"/>
-
-    <target name="-minify.test"
-            depends="-rev,
-                     -usemin,
-                     -js.all.minify,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -htmlcompress,
-                     -imagespng,
-                     -imagesjpg,
-                     -copy"/>
-
-    <target name="-minify.production"
-            depends="-rev,
-                     -usemin,
-                     -js.all.minify,
-                     -js.main.concat,
-                     -js.mylibs.concat,
-                     -js.scripts.concat,
-                     -css,
-                     -manifest,
-                     -htmlcompress,
-                     -imagespng,
-                     -imagesjpg,
-                     -copy"/>
 
     <!--
     *************************************************
@@ -413,9 +267,13 @@
         
     <target name="-clean" description="(PRIVATE) Wipe the previous build (Deletes the dir.publish directory">
     <!-- This is a private target -->        
-        <echo message="Cleaning up previous build directory..."/>
-        <delete dir="./${dir.intermediate}/"/>
-        <delete dir="./${dir.publish}/"/>
+        <echo message="Cleaning up old stylesheet files"/>
+    	<delete dir="${dir.publish}/css/"/>
+    	<echo message="Cleaning up old javascript files"/>
+    	<delete dir="${dir.publish}/js/"/>
+    	
+    	<mkdir dir="${dir.publish}/css"/>
+    	<mkdir dir="${dir.publish}/js"/>
     </target>
     
     
@@ -470,7 +328,6 @@
     
     <target name="-copy" depends="-mkdirs">
     <!-- This is a private target -->
-    
         <echo message="Copying over new files..."/>
         <copy todir="${dir.publish}">
             <fileset dir="${dir.source}/" excludes="${file.default.exclude}, ${file.exclude}">
@@ -491,7 +348,6 @@
     
     <target name="-copy.debug" depends="-mkdirs">
     <!-- This is a private target -->
-    
         <echo message="Copying over new files..."/>
         <copy todir="${dir.publish}">
             <fileset dir="${dir.source}/" excludes="${file.default.exclude}, ${file.exclude}, index.html">
@@ -558,33 +414,7 @@
 		</move>
 	</target>
     
-    <target name="-js.mylibs.concat" depends="-js.all.minify" description="(PRIVATE) Concatenates the JS files in dir.js.mylibs">
-        <mkdir dir="./${dir.intermediate}/${dir.js.mylibs}"/>
-
-        <echo message="Concatenating JS libraries"/>
-        <!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
-        <concat destfile="./${dir.intermediate}/${dir.js}/mylibs-concat.js">
-            <fileset dir="./${dir.intermediate}/${dir.js.mylibs}/"
-                includes="**/*.js" 
-                excludes="${file.js.bypass}"/>                
-        </concat>
-    </target>
-    
-    <target name="-js.mylibs.debug.concat" description="(PRIVATE) Concatenates the JS files in dir.js.mylibs">
-        <mkdir dir="./${dir.intermediate}/${dir.js.mylibs}"/>
-
-        <echo message="Concatenating JS libraries"/>
-        <!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
-        <concat destfile="./${dir.intermediate}/${dir.js}/mylibs-concat.js">
-            <fileset dir="./${dir.intermediate}/${dir.js.mylibs}/"
-                includes="**/*.js" 
-                excludes="${file.js.bypass}"/>                
-                  
-        </concat>
-    </target>
-    
-    
-    <target name="-js.scripts.concat" depends="-js.main.concat,-js.mylibs.concat" if="build.concat.scripts">
+    <target name="-js.scripts.concat" depends="-js.main.concat" if="build.concat.scripts">
         <echo message="Concatenating library file with main script file"/>
         <!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
         <concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.min.js">
@@ -607,17 +437,10 @@
         <copy file="${dir.intermediate}/${dir.js}/scripts-concat.min.js" tofile="${dir.publish}/${dir.js}/${scripts.sha}.js" />
     </target>
     
-    <target name="-js.scripts.debug.concat" depends="-js.debug.concat,-js.mylibs.debug.concat" if="build.concat.scripts">
-        <echo message="Concatenating library file with main script file"/>
-        <!-- overwrite=no here means not to overwrite if the target is newer than the sources -->
-        <concat destfile="./${dir.intermediate}/${dir.js}/scripts-concat.min.js">
-            <fileset dir="./${dir.intermediate}/${dir.js}/">
-                <include name="mylibs-concat.js"/>
-                <include name="scripts-concat.js"/>
-            </fileset>      
-        </concat>
+    <target name="-js.scripts.debug.concat" depends="-js.debug.concat" if="build.concat.scripts">
+        <echo message="Creating sha hash and copy to production"/>
 
-        <checksum file="${dir.intermediate}/${dir.js}/scripts-concat.min.js" algorithm="sha" property="scripts.sha" />
+        <checksum file="${dir.intermediate}/${dir.js}/scripts-concat.js" algorithm="sha" property="scripts.sha" />
         <if>
             <isset property="gae.js_dir" />
             <then>
@@ -628,7 +451,7 @@
             </else>
         </if>
         
-        <copy file="${dir.intermediate}/${dir.js}/scripts-concat.min.js" tofile="${dir.publish}/${dir.js}/${scripts.sha}.js" />
+        <copy file="${dir.intermediate}/${dir.js}/scripts-concat.js" tofile="${dir.publish}/${dir.js}/${scripts.sha}.js" />
         <copy todir="${dir.publish}/">
           <fileset dir="${dir.intermediate}/">
               <include name="${dir.js}/**/*.js"/>

@@ -1,37 +1,36 @@
 /**
  * BarFoos Module (Layer 3)
  * -----------------------------------------
- * Box2D: This module handles the center box with help of CSS3 in good old fashion 2D
+ * Navigation: This module handles the top navigation
  *
  * This code runs in strict mode (if supported by the environment).
  * -----------------------------------------
  * Author: Andreas Goebel
- * Date: 2011-11-12
- * Changed: 2011-11-12
+ * Date: 2011-12-05
+ * Changed: 2011-12-05
  */
 
-!(function _module_box2d_wrap( win, doc, undef ) {
+!(function _module_navigation_wrap( win, doc, undef ) {
 	"use strict";
 	var BF		= win.BarFoos = win.BarFoos || { },
 		Modules	= BF.Modules = BF.Modules || { },
 	
-	Box2D = function _Box2D( Sandbox, App, secret ) {
+	Navigation = function _Navigation( Sandbox, App, secret ) {
 		secret	= secret || { };
 		
 		var	Public	= BF.ModuleCtor( Sandbox, App, secret ) || { }, // inherit from "Module Base Pattern"
 			Private	= { 
 				deploymentData: { 
-					rootNode: '#box'
+					rootNode: '#menu'
 				},
-				nodes:				{ }
+				nodes:			{ }
 			},
 			$$		= secret.$$;
 
 		/****** Core Methods (called by the core only) *********** *******/
 		/****** ************************************************** *******/
 		Public.init = function _init() {
-			Sandbox.listen( [	'MenuEntryHovered',
-								'MenuEntryLeft' ], Private.eventHandler, this );
+			Sandbox.listen( [	'Dummy' ], Private.eventHandler, this );
 			
 			Public.deployAs( 'static', Private.deploymentData ).then(function _done( rootNode ) {
 				Private.cacheElements( rootNode ).bindDOMevents().initElements();
@@ -43,8 +42,7 @@
 		Public.destroy = function _destroy() {
 			secret.clearNodeBindings();
 			
-			Sandbox.forget( [	'MenuEntryHovered',
-								'MenuEntryLeft' ], Private.eventHandler );
+			Sandbox.forget( [	'Dummy' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
@@ -56,9 +54,7 @@
 				rootNode	= nodes.rootNode;
 			
 			switch( event.name ) {
-				case 'MenuEntryHovered':
-					break;
-				case 'MenuEntryLeft':
+				case 'Dummy':
 					break;
 			}
 		};
@@ -66,9 +62,19 @@
 		// cacheElements() extends secret.nodes with DOM element references
 		Private.cacheElements = function _cacheElements( rootNode ) {
 			Sandbox.extend( secret.nodes, (function _extendClosure() {
+				var ulMenu			= rootNode.find( 'ul.menuentrys' ),
+					liAbout			= ulMenu.find( 'li.about' ),
+					liBlog			= ulMenu.find( 'li.blog' ),
+					liGithub		= ulMenu.find( 'li.github' ),
+					liAwesomeness	= ulMenu.find( 'li.awesomeness' );
 				
 				return {
-					rootNode:		rootNode
+					rootNode:		rootNode,
+					ulMenu:			ulMenu,
+					liAbout:		liAbout,
+					liBlog:			liBlog,
+					liGithub:		liGithub,
+					liAwesomeness:	liAwesomeness
 				};
 			}()));
 			
@@ -78,9 +84,20 @@
 		// bindDOMevents will take care of browser DOM level events
 		Private.bindDOMevents = function _bindDOMevents() {
 			var	nodes			= secret.nodes,
-				rootNode		= nodes.rootNode;
+				ulMenu			= nodes.ulMenu;
 			
 			if( nodes ) {
+				ulMenu
+					.on( 'mouseenter', 'li', function _delegateMouseEnter( event ) {
+						var $$this = $$( this );
+						
+						Sandbox.dispatch({ name: 'MenuEntryHovered', data: {
+							direction:	$$this.data( 'view' )
+						}});
+				})
+					.on( 'mouseleave', 'li', function _delegateMouseLeave( event ) {
+						Sandbox.dispatch({ name: 'MenuEntryLeft' });
+				});
 			}
 			
 			return Private;
@@ -91,43 +108,11 @@
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
 			
-			rootNode.addClass( 'boxFace' ).css({
-				width:		'100%',
-				padding:	'0px'
-			});
-			
-			Private.fadeAway();
-			
 			return Private;
-		};
-		
-		Private.fadeAway = function _fadeAway() {
-			var nodes		= secret.nodes,
-				rootNode	= nodes.rootNode;
-				
-			(function _loop() {
-				var clone = rootNode.clone();
-				
-				clone.removeAttr( 'id' ).css({
-					position:	'absolute',
-					top:		rootNode.offset().top,
-					left:		rootNode.offset().left,
-					width:		rootNode.outerWidth( true ),
-					height:		rootNode.outerHeight(),
-					zIndex:		-1,
-					opacity:	0.65
-				}).appendTo( rootNode.parent() ).animate({
-					transform:	'scale(1.2,1.2) skew(11deg, -6deg)',
-					opacity:	0
-				}, 11000, function _animateDone() {
-					clone.remove();
-					_loop();
-				});
-			}());
 		};
 					
 		return Public;
 	};
 	
-	Modules.Box2D = Box2D;
+	Modules.Navigation = Navigation;
 }( window, window.document ));

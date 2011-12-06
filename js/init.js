@@ -35,7 +35,7 @@
 		};
 		
 		Public.name			= 'TypeofNaN 2.0 Website';
-		Public.version		= 0.10;
+		Public.version		= 0.15;
 				
 		return Public;
 	}());
