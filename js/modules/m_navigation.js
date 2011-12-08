@@ -30,7 +30,7 @@
 		/****** Core Methods (called by the core only) *********** *******/
 		/****** ************************************************** *******/
 		Public.init = function _init() {
-			Sandbox.listen( [	'Dummy' ], Private.eventHandler, this );
+			Sandbox.listen( [	'BoxFaceClicked' ], Private.eventHandler, this );
 			
 			Public.deployAs( 'static', Private.deploymentData ).then(function _done( rootNode ) {
 				Private.cacheElements( rootNode ).bindDOMevents().initElements();
@@ -42,7 +42,7 @@
 		Public.destroy = function _destroy() {
 			secret.clearNodeBindings();
 			
-			Sandbox.forget( [	'Dummy' ], Private.eventHandler );
+			Sandbox.forget( [	'BoxFaceClicked' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
@@ -54,7 +54,8 @@
 				rootNode	= nodes.rootNode;
 			
 			switch( event.name ) {
-				case 'Dummy':
+				case 'BoxFaceClicked':
+					rootNode.find( '.entryLocked' ).removeClass( 'entryLocked' );
 					break;
 			}
 		};
@@ -87,16 +88,18 @@
 				ulMenu			= nodes.ulMenu;
 			
 			if( nodes ) {
-				ulMenu
-					.on( 'mouseenter', 'li', function _delegateMouseEnter( event ) {
-						var $$this = $$( this );
-						
-						Sandbox.dispatch({ name: 'MenuEntryHovered', data: {
-							direction:	$$this.data( 'view' )
-						}});
-				})
-					.on( 'mouseleave', 'li', function _delegateMouseLeave( event ) {
-						Sandbox.dispatch({ name: 'MenuEntryLeft' });
+				ulMenu.on( 'mouseenter', 'li', function _delegateMouseEnter( event ) {
+					var $$this = $$( this );
+					
+					Sandbox.dispatch({ name: 'MenuEntryHovered', data: {
+						direction:	$$this.data( 'view' )
+					}});
+				}).on( 'mouseleave', 'li', function _delegateMouseLeave( event ) {
+					Sandbox.dispatch({ name: 'MenuEntryLeft' });
+				}).on( 'click', 'li', function _delegateClick( event ) {
+					ulMenu.find( '.entryLocked' ).removeClass( 'entryLocked' );
+					$$(this).addClass( 'entryLocked' );
+					Sandbox.dispatch({ name: 'MenuEntryClicked' });
 				});
 			}
 			

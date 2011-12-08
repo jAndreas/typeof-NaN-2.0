@@ -51,9 +51,9 @@ body, button, input, select, textarea { font-family: sans-serif; color: #222; }
    Links
    ========================================================================== */
 
-a { color: #00e; }
-a:visited { color: #551a8b; }
-a:hover { color: #06e; }
+a { color: #dd0; }
+a:visited { color: #dd0; }
+a:hover { color: #ddf; }
 a:focus { outline: thin dotted; }
 
 /* Improve readability when focused and hovered in all browsers: h5bp.com/h */
@@ -292,6 +292,12 @@ ul.menuentrys > li:hover {
     text-shadow: -1px -1px 6px rgba(255,255,150,0.7), 0px 0px 3px rgba(40,40,235, 0.6);
 }
 
+.entryLocked {
+	color: rgba(255,255,255,1) !important;   
+    text-shadow: -1px -1px 6px rgba(255,255,150,0.7), 0px 0px 3px rgba(40,40,235, 0.6) !important;
+	text-decoration: underline !important;
+}
+
 div#boxStage {
 	text-align: center;
 
@@ -330,6 +336,12 @@ div#box {
 	
 	border: 1px solid #fff;
 	opacity: 1;
+	
+	color: white;
+	font-size: 12px;
+	overflow: hidden;
+	
+	text-shadow: -1px -1px 8px white, 1px 1px 1px black;
 }
 
 span.websiteTitle {
@@ -339,6 +351,61 @@ span.websiteTitle {
 	text-shadow: 0px 0px 4px blue, 2px 2px 2px white, -2px -2px 3px white;
 }
 
+div#content > div {
+	display: none;
+}
+
+div.titleWrap {
+	width: 95%;
+	height: 105px;
+	overflow: hidden;
+}
+
+img.aboutPortrait {
+	width: 90px;
+	height: 105px;
+	display: inline-block;
+	
+	-webkit-border-radius: 22px;
+	-moz-border-radius: 22px;
+	-o-border-radius: 22px;
+	-ms-border-radius: 22px;
+    border-radius: 22px;
+}
+
+h2.aboutTitle {
+	display: inline-block;
+	margin-left: 5px;
+	position: relative;
+}
+
+span.aboutSubtitle {
+	display: inline-block;
+	font-size: 10px;
+	position: relative;
+	top: 15px;
+}
+
+ul.aboutList {
+	list-style: none;
+}
+
+ul.aboutList li {
+	float: right;
+	margin-left: 10px;
+	font-size: 10px;
+}
+
+div.aboutBioShort {
+	width: 100%;
+	height: 225px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	font-size: 12px;
+	padding-right: 6px;
+	font-weight: bold;
+	text-shadow: none;
+}
 
 
 

@@ -34,7 +34,8 @@
 					bottom:		[ -90, 0, 180, true ]
 				},
 				xAngle:				35,
-				yAngle:				0
+				yAngle:				0,
+				boxSideLocked:		false
 			},
 			$$		= secret.$$;
 
@@ -42,7 +43,9 @@
 		/****** ************************************************** *******/
 		Public.init = function _init() {
 			Sandbox.listen( [	'MenuEntryHovered',
-								'MenuEntryLeft' ], Private.eventHandler, this );
+								'MenuEntryLeft',
+								'MenuEntryClicked',
+								'BoxFaceClicked' ], Private.eventHandler, this );
 			
 			Public.deployAs( 'static', Private.deploymentData ).then(function _done( rootNode ) {
 				Private
@@ -59,7 +62,9 @@
 			secret.clearNodeBindings();
 			
 			Sandbox.forget( [	'MenuEntryHovered',
-								'MenuEntryLeft' ], Private.eventHandler );
+								'MenuEntryLeft',
+								'MenuEntryClicked',
+								'BoxFaceClicked' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
@@ -77,7 +82,17 @@
 					}, 1000);
 					break;
 				case 'MenuEntryLeft':
+					if(!Private.boxSideLocked ) {
+						Private.boxRotate( 3000 );
+					}
+					break;
+				case 'MenuEntryClicked':
+					Private.boxSideLocked = true;
+					rootNode.stop( true );
+					break;
+				case 'BoxFaceClicked':
 					Private.boxRotate( 3000 );
+					Private.boxSideLocked = false;
 					break;
 			}
 		};
@@ -100,18 +115,22 @@
 				rootNode		= nodes.rootNode;
 			
 			if( nodes ) {
-				rootNode.on( 'mouseenter', '.boxFace', function _boxFaceMouseEnter( e ) {
+				rootNode.on( 'mouseenter', '.boxFace', function _boxFaceMouseEnter( event ) {
 					var $$this		= $$( this );
 					
 					$$this.css({
 						background:	'-webkit-linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005'
 					});
-				}).on( 'mouseleave', '.boxFace', function _boxFaceMouseLeave( e ) {
+				}).on( 'mouseleave', '.boxFace', function _boxFaceMouseLeave( event ) {
 					var $$this		= $$( this );
 					
 					$$this.css({
 						background:	'-webkit-linear-gradient(#12226F, #9FBDD9) repeat scroll 0 0 #005'
 					});
+				}).on( 'click', '.boxFace', function _boxFaceClick( event ) {
+					Sandbox.dispatch({ name: 'BoxFaceClicked' });
+				}).on( 'click', 'a', function _anchorClicked( event ) {
+					event.stopPropagation();
 				});
 			}
 			
@@ -162,7 +181,7 @@
 				secret.nodes[ side ] = $$( '<div>', {
 					'class':		'boxFace',
 					'transform':	'rotateX(0deg) rotateY(0deg) translateZ(200px) rotate(0deg)',
-					'text':			side
+					'html':			$$( 'div[data-target=' + side + ']' ).html()
 				}).appendTo( rootNode ).delay(15, 'animate', {
 					transform:	'rotateX(%rdeg) rotateY(%rdeg) translateZ(200px) rotate(%rdeg)'.sFormat( data[ side ] )
 				}, 1500);
