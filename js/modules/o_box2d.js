@@ -110,10 +110,10 @@
 				
 				clone.removeAttr( 'id' ).css({
 					position:	'absolute',
-					top:		rootNode.offset().top,
-					left:		rootNode.offset().left,
+					top:		rootNode.position().top,
+					left:		rootNode.position().left,
 					width:		rootNode.outerWidth( true ),
-					height:		rootNode.outerHeight(),
+					height:		rootNode.outerHeight( true ) - win.parseInt( rootNode.css( 'margin-top' ), 10 ),
 					zIndex:		-1,
 					opacity:	0.65
 				}).appendTo( rootNode.parent() ).animate({
