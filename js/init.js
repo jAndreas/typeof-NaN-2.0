@@ -36,6 +36,38 @@
 		
 		Public.name			= 'TypeofNaN 2.0 Website';
 		Public.version		= 0.15;
+		Public.htmlVideo	= (function _htmlVideoCheck() {
+			var elem = doc.createElement('video'),
+				bool = false;
+	
+			try {
+				if( !!elem.canPlayType ) {
+					bool		= new Boolean(bool);
+					bool.ogg	= elem.canPlayType('video/ogg; codecs="theora"');
+					bool.h264	= elem.canPlayType('video/mp4; codecs="avc1.42E01E"');
+	 				bool.webm	= elem.canPlayType('video/webm; codecs="vp8, vorbis"');
+				}
+			} catch(e) { }
+	
+			return bool;
+		}());
+		Public.htmlAudio	= (function _htmlAudioCheck() {
+			var elem = document.createElement('audio'),
+				bool = false;
+	
+			try {
+				if( !!elem.canPlayType ) {
+					bool = new Boolean(bool);
+					bool.ogg = elem.canPlayType('audio/ogg; codecs="vorbis"');
+					bool.mp3 = elem.canPlayType('audio/mpeg;');
+	
+					bool.wav = elem.canPlayType('audio/wav; codecs="1"');
+					bool.m4a = ( elem.canPlayType('audio/x-m4a;') || elem.canPlayType('audio/aac;'));
+				}
+			} catch(e) { }
+	
+			return bool;
+		}());
 				
 		return Public;
 	}());

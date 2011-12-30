@@ -45,7 +45,8 @@
 			Sandbox.listen( [	'MenuEntryHovered',
 								'MenuEntryLeft',
 								'MenuEntryClicked',
-								'BoxFaceClicked' ], Private.eventHandler, this );
+								'BoxFaceClicked',
+								'ThunderStroke' ], Private.eventHandler, this );
 			
 			Public.deployAs( 'static', Private.deploymentData ).then(function _done( rootNode ) {
 				Private
@@ -64,7 +65,8 @@
 			Sandbox.forget( [	'MenuEntryHovered',
 								'MenuEntryLeft',
 								'MenuEntryClicked',
-								'BoxFaceClicked' ], Private.eventHandler );
+								'BoxFaceClicked',
+								'ThunderStroke' ], Private.eventHandler );
 		};
 		/*^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
 		/*^^^^^ ^^^^^^^^^^^^^^ BLOCK END ^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^*/
@@ -77,22 +79,44 @@
 			
 			switch( event.name ) {
 				case 'MenuEntryHovered':
-					rootNode.stop().delay(35, 'animate', {
+					rootNode.stop().animate({
 						transform:	'rotateX(%rdeg) rotateY(%rdeg) rotate(%rdeg)'.sFormat( Private.mapView( eventData.direction ) )
 					}, 1000);
 					break;
 				case 'MenuEntryLeft':
 					if(!Private.boxSideLocked ) {
-						Private.boxRotate( 3000 );
+						Private.boxRotate( 3000, true );
 					}
 					break;
 				case 'MenuEntryClicked':
 					Private.boxSideLocked = true;
-					rootNode.stop( true );
+					rootNode.stop( true, true );
 					break;
 				case 'BoxFaceClicked':
 					Private.boxRotate( 3000 );
 					Private.boxSideLocked = false;
+					break;
+				case 'ThunderStroke':
+					Object.keys( nodes ).some(function _forSome( name ) {
+						if( name !== 'rootNode' ) {
+							nodes[ name ].stop().animate({
+								opacity: 0.18
+							}, 200, function() {
+								$$( this ).animate({
+									opacity: 0.75
+								}, 200, function() {
+									$$( this ).animate({
+										opacity: 0.25
+									}, 500, function() {
+										$$( this ).animate({
+											opacity: 0.98
+										}, 600);
+									}, 'ease');
+								}, 'ease');
+							}, 'ease');
+						}
+					});
+
 					break;
 			}
 		};
@@ -121,14 +145,19 @@
 					$$this.css({
 						background:	'-webkit-linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005'
 					});
+					
+					return false;
 				}).on( 'mouseleave', '.boxFace', function _boxFaceMouseLeave( event ) {
 					var $$this		= $$( this );
 					
 					$$this.css({
 						background:	'-webkit-linear-gradient(#12226F, #9FBDD9) repeat scroll 0 0 #005'
 					});
+					
+					return false;
 				}).on( 'click', '.boxFace', function _boxFaceClick( event ) {
 					Sandbox.dispatch({ name: 'BoxFaceClicked' });
+					return false;
 				}).on( 'click', 'a', function _anchorClicked( event ) {
 					event.stopPropagation();
 				});
@@ -146,30 +175,24 @@
 				transformStyle:	'preserve-3d'
 			}).animate({
 				opacity:	0.15
-			}, 1500, function _afterOpacity() {
+			}, 800, function _afterOpacity() {
 				rootNode.animate({
 					transform:	'rotateX(%rdeg) rotateY(%rdeg)'.sFormat( Private.xAngle, Private.yAngle ),
 					opacity:	0.98
-				}, 2000, Private.boxRotate);
+				}, 800, function _afterBoxPositioning() {
+					Sandbox.dispatch({ name: 'BoxInitialized' });
+					Private.boxRotate();
+				});
 			});
 			
-			/*win.setInterval(function _flashLight() {
-				Object.keys( nodes ).some(function _forSome( name ) {
-					if( name === 'rootNode' )
-						return false;
-				
-					nodes[ name ].animate({
-						opacity:	0.32
-					}, ~~(Math.random()*1400), (function _afterReduceOpacity( node ) {
-						return function() {
-							node.animate({
-								opacity:	0.98
-							}, ~~(Math.random()*1400));
-						};
-					}( nodes[ name ] )));
-				});
-			}, ~~(Math.random() * 9000) + 4000);*/
-			
+			if( App.htmlVideo && App.htmlVideo.ogg ) {
+				nodes.back.find( 'embed' ).remove();
+				nodes.back.find( 'video' )[ 0 ].play();
+			}
+			else {
+				nodes.back.find( 'video' ).remove();
+			}
+						
 			return Private;
 		};
 		
@@ -182,24 +205,28 @@
 					'class':		'boxFace',
 					'transform':	'rotateX(0deg) rotateY(0deg) translateZ(200px) rotate(0deg)',
 					'html':			$$( 'div[data-target=' + side + ']' ).html()
-				}).appendTo( rootNode ).delay(15, 'animate', {
+				}).appendTo( rootNode ).animate({
 					transform:	'rotateX(%rdeg) rotateY(%rdeg) translateZ(200px) rotate(%rdeg)'.sFormat( data[ side ] )
-				}, 1500);
+				}, 1800);
 			});
 			
 			return Private;
 		};
 		
-		Private.boxRotate = function _boxRotate( speed ) {
+		Private.boxRotate = function _boxRotate( speed, addToQueue ) {
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
-				
+		console.log('boxRotate()');
 			Private.xAngle = Private.xAngle * -1;
 			Private.yAngle += 340;
+			
+			if(!addToQueue) {
+				rootNode.stop();
+			}
 		
 			rootNode.animate({
 				transform:	'rotateX(%rdeg) rotateY(%rdeg)'.sFormat( Private.xAngle, Private.yAngle )
-			}, speed || 20000, _boxRotate, 'linear');
+			}, speed || 16000, _boxRotate, 'linear');
 			
 			return Private;
 		};

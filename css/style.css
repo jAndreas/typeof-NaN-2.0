@@ -51,8 +51,8 @@ body, button, input, select, textarea { font-family: sans-serif; color: #222; }
    Links
    ========================================================================== */
 
-a { color: #dd0; }
-a:visited { color: #dd0; }
+a { color: #ff8; }
+a:visited { color: #ff8; }
 a:hover { color: #ddf; }
 a:focus { outline: thin dotted; }
 
@@ -209,6 +209,11 @@ td { vertical-align: top; }
 body {
 	background: url(/img/bg.jpg) repeat scroll 0 0 transparent;
 }
+
+video {
+	width: 100%;
+	height: 100%;
+}
  
 div#container{	
 	position: absolute;
@@ -216,14 +221,13 @@ div#container{
 	left: 0;
 	bottom: 0;
 	right: 0;
-	overflow: hidden;
 }
 
 div#main {
 	position: relative;
 	margin: 110px auto auto;
-	width: 720px;
-	height: 480px;
+	width: 1024px;
+	height: 768px;
 	text-align: center;
 }
 
@@ -240,6 +244,7 @@ div#menu {
     font-family: Verdana;
     font-size: 22px;
 	text-align: center;
+	top: -60px;
 	
 	-webkit-border-radius: 22px;
 	-moz-border-radius: 22px;
@@ -367,12 +372,18 @@ div.titleWrap {
 	width: 95%;
 	height: 105px;
 	overflow: hidden;
+	padding-bottom: 6px;
 }
 
 img.aboutPortrait {
 	width: 90px;
 	height: 105px;
 	display: inline-block;
+	
+	box-shadow: 0 0 8px 1px white;
+	margin-top: 3px;
+	border: 1px solid white;
+	border-image: initial;
 	
 	-webkit-border-radius: 22px;
 	-moz-border-radius: 22px;

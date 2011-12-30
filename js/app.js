@@ -12,6 +12,7 @@
  
 !(function _application_wrap( win ) {
 	"use strict";
+	
 	var	BF = win.BarFoos = win.BarFoos || { },
 		BFapps = BF.apps = BF.apps || { };
 
@@ -33,6 +34,10 @@
 		}
 		else {
 			Core.registerModule( 'Box2D' );
+		}
+		
+		if( App.htmlAudio ) {
+			Core.registerModule( 'Thunder' );
 		}
 		
 		// startup all registered Modules
