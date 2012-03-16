@@ -35,7 +35,8 @@
 				},
 				xAngle:				35,
 				yAngle:				0,
-				boxSideLocked:		false
+				boxSideLocked:		false,
+				defaultRotateSpeed:	16000
 			},
 			$$		= secret.$$;
 
@@ -97,7 +98,7 @@
 					Private.boxSideLocked = false;
 					break;
 				case 'ThunderStroke':
-					Object.keys( nodes ).some(function _forSome( name ) {
+					/*Object.keys( nodes ).some(function _forSome( name ) {
 						if( name !== 'rootNode' ) {
 							nodes[ name ].stop().animate({
 								opacity: 0.18
@@ -115,7 +116,7 @@
 								}, 'ease');
 							}, 'ease');
 						}
-					});
+					});*/
 
 					break;
 			}
@@ -142,17 +143,13 @@
 				rootNode.on( 'mouseenter', '.boxFace', function _boxFaceMouseEnter( event ) {
 					var $$this		= $$( this );
 					
-					$$this.css({
-						background:	'-webkit-linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005'
-					});
+					$$this.addClass( 'hoverState' );
 					
 					return false;
 				}).on( 'mouseleave', '.boxFace', function _boxFaceMouseLeave( event ) {
 					var $$this		= $$( this );
 					
-					$$this.css({
-						background:	'-webkit-linear-gradient(#12226F, #9FBDD9) repeat scroll 0 0 #005'
-					});
+					$$this.removeClass( 'hoverState' );
 					
 					return false;
 				}).on( 'click', '.boxFace', function _boxFaceClick( event ) {
@@ -178,14 +175,14 @@
 			}, 800, function _afterOpacity() {
 				rootNode.animate({
 					transform:	'rotateX(%rdeg) rotateY(%rdeg)'.sFormat( Private.xAngle, Private.yAngle ),
-					opacity:	0.98
+					opacity:	1
 				}, 800, function _afterBoxPositioning() {
 					Sandbox.dispatch({ name: 'BoxInitialized' });
 					Private.boxRotate();
 				});
 			});
 			
-			if( App.htmlVideo && App.htmlVideo.ogg ) {
+			if( App.htmlVideo && ( App.htmlVideo.ogg || App.htmlVideo.h264 || App.htmlVideo.webm ) ) {
 				nodes.back.find( 'embed' ).remove();
 				nodes.back.find( 'video' )[ 0 ].play();
 			}
@@ -204,7 +201,7 @@
 				secret.nodes[ side ] = $$( '<div>', {
 					'class':		'boxFace',
 					'transform':	'rotateX(0deg) rotateY(0deg) translateZ(200px) rotate(0deg)',
-					'html':			$$( 'div[data-target=' + side + ']' ).html()
+					'html':			$$( 'div[data-target=' + side + ']' ).remove().html()
 				}).appendTo( rootNode ).animate({
 					transform:	'rotateX(%rdeg) rotateY(%rdeg) translateZ(200px) rotate(%rdeg)'.sFormat( data[ side ] )
 				}, 1800);
@@ -213,10 +210,10 @@
 			return Private;
 		};
 		
-		Private.boxRotate = function _boxRotate( speed, addToQueue ) {
+		Private.boxRotate = function _boxRotate( speed, addToQueue ) {			
 			var nodes		= secret.nodes,
 				rootNode	= nodes.rootNode;
-		console.log('boxRotate()');
+		//console.log('boxRotate()');
 			Private.xAngle = Private.xAngle * -1;
 			Private.yAngle += 340;
 			
@@ -226,8 +223,8 @@
 		
 			rootNode.animate({
 				transform:	'rotateX(%rdeg) rotateY(%rdeg)'.sFormat( Private.xAngle, Private.yAngle )
-			}, speed || 16000, _boxRotate, 'linear');
-			
+			}, speed || Private.defaultRotateSpeed, _boxRotate, 'linear');
+		
 			return Private;
 		};
 		

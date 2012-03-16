@@ -25,8 +25,8 @@
 					htmlString:			'<audio autoplay src=""></audio>'
 				},
 				nodes:			{ },
-				thunderDelay:	10000,
-				thunderRand:	5000,
+				thunderDelay:	15000,
+				thunderRand:	7000,
 				thunderSounds:	[ '/sound/storm-thunder.wav', '/sound/thunder.wav', '/sound/thunder2.wav' ]
 			},
 			$$		= secret.$$;

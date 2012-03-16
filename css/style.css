@@ -311,13 +311,13 @@ ul.menuentrys > li:hover {
 div#boxStage {
 	text-align: center;
 
-	-webkit-perspective: 800;
+	-webkit-perspective: 800px;
 	-webkit-perspective-origin: 50% 200px;
-	-moz-perspective: 800;
+	-moz-perspective: 800px;
 	-moz-perspective-origin: 50% 200px;
-	-o-perspective: 800;
+	-o-perspective: 800px;
 	-o-perspective-origin: 50% 200px;
-	-ms-perspective: 800;
+	-ms-perspective: 800px;
 	-ms-perspective-origin: 50% 200px;
 }
 
@@ -355,6 +355,16 @@ div#box {
 	overflow: hidden;
 	
 	text-shadow: -1px -1px 8px white, 1px 1px 1px black;
+}
+
+.hoverState {
+	background: -webkit-gradient(linear, left top, left bottom, from(#12226F), to(#7FBDDF)) repeat scroll 0 0 #005;
+	background: -webkit-linear-gradient(#12226F, #7FBDDF) repeat scroll 0 0 #005; 
+	background: -moz-linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005;
+	background: -ms-linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005;
+	background: -o-linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005;
+	background: linear-gradient(#12226F,#7FBDDF) repeat scroll 0 0 #005;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#12226F', EndColorStr='#7FBDDF');
 }
 
 span.websiteTitle {
