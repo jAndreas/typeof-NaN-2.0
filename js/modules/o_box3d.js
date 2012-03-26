@@ -125,9 +125,11 @@
 		// cacheElements() extends secret.nodes with DOM element references
 		Private.cacheElements = function _cacheElements( rootNode ) {
 			Sandbox.extend( secret.nodes, (function _extendClosure() {
+				var btnWoodify =	rootNode.find( 'button.woodify' );
 				
 				return {
-					rootNode:		rootNode
+					rootNode:		rootNode,
+					btnWoodify:		btnWoodify
 				};
 			}()));
 			
@@ -140,24 +142,43 @@
 				rootNode		= nodes.rootNode;
 			
 			if( nodes ) {
-				rootNode.on( 'mouseenter', '.boxFace', function _boxFaceMouseEnter( event ) {
-					var $$this		= $$( this );
-					
-					$$this.addClass( 'hoverState' );
-					
-					return false;
-				}).on( 'mouseleave', '.boxFace', function _boxFaceMouseLeave( event ) {
-					var $$this		= $$( this );
-					
-					$$this.removeClass( 'hoverState' );
-					
-					return false;
-				}).on( 'click', '.boxFace', function _boxFaceClick( event ) {
-					Sandbox.dispatch({ name: 'BoxFaceClicked' });
-					return false;
-				}).on( 'click', 'a', function _anchorClicked( event ) {
-					event.stopPropagation();
-				});
+				rootNode
+					.on( 'mouseenter', '.boxFace', boxFaceMouseEnter)
+					.on( 'mouseleave', '.boxFace', boxFaceMouseLeave)
+					.on( 'click', '.boxFace', boxFaceClick)
+					.on( 'click', 'a', anchorClicked);
+				
+				nodes.btnWoodify.on( 'click', handlerWoodifyClick );
+			}
+			
+			// local helpers
+			function boxFaceMouseEnter( event ) {
+				var $$this		= $$( this );
+				
+				$$this.addClass( Private.woodified ? 'woodHoverState' : 'hoverState' );
+				
+				return false;
+			}
+			function boxFaceMouseLeave( event ) {
+				var $$this		= $$( this );
+				
+				$$this.removeClass( Private.woodified ? 'woodHoverState' : 'hoverState' );
+				
+				return false;
+			}
+			function boxFaceClick( event ) {
+				Sandbox.dispatch({ name: 'BoxFaceClicked' });
+				return false;
+			}
+			function anchorClicked( event ) {
+				event.stopPropagation();
+			}
+			function handlerWoodifyClick( event ) {
+				Object.keys( Private.creationData ).forEach( changeBackgroundImage );
+			}
+			function changeBackgroundImage( side ) {
+				secret.nodes[ side ].css({ background: 'url(/img/wood.jpg) no-repeat', backgroundSize: '100%' });
+				Private.woodified = true;
 			}
 			
 			return Private;
