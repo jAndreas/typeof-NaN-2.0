@@ -347,6 +347,9 @@ div#box {
 	background: linear-gradient(top, #12226F, #9FBDD9) repeat scroll 0 0 #005;
 	filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#12226F', EndColorStr='#9FBDD9');
 	
+	background: url(/img/sirius.jpg) no-repeat;
+
+	
 	border: 1px solid #fff;
 	opacity: 1;
 	

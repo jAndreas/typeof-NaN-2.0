@@ -155,14 +155,14 @@
 			function boxFaceMouseEnter( event ) {
 				var $$this		= $$( this );
 				
-				$$this.addClass( Private.woodified ? 'woodHoverState' : 'hoverState' );
+				$$this.addClass( 'woodHoverState' );
 				
 				return false;
 			}
 			function boxFaceMouseLeave( event ) {
 				var $$this		= $$( this );
 				
-				$$this.removeClass( Private.woodified ? 'woodHoverState' : 'hoverState' );
+				$$this.removeClass( 'woodHoverState' );
 				
 				return false;
 			}
@@ -177,7 +177,7 @@
 				Object.keys( Private.creationData ).forEach( changeBackgroundImage );
 			}
 			function changeBackgroundImage( side ) {
-				secret.nodes[ side ].css({ background: 'url(/img/wood.jpg) no-repeat', backgroundSize: '100%' });
+				secret.nodes[ side ].css({ background: 'url(/img/wood.jpg) no-repeat', backgroundSize: '135%' });
 				Private.woodified = true;
 			}
 			
